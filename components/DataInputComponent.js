@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import NumericInputComponent from "./NumericInputComponent";
 import OptionsInputComponent from "./OptionsInputComponent";
 import StringInputComponent from "./StringInputComponent";
+import LocationInputComponent from "./LocationInputComponent";
 
 export default function ({props}) {
 
@@ -20,11 +21,15 @@ export default function ({props}) {
                         options={props.options}
                         value={props.value}
                         setterCallback={props.callback}/>
-                    :
-                    <StringInputComponent
-                        title={props.title}
-                        value={props.value}
-                        setterCallback={props.callback}/>}
+                    : props.location != null ?
+                        <LocationInputComponent
+                            title={props.title}
+                            location={props.location}
+                            setterCallbacks={props.callbacks}/>
+                        : <StringInputComponent
+                            title={props.title}
+                            value={props.value}
+                            setterCallback={props.callback}/>}
         </View>
     )
 }

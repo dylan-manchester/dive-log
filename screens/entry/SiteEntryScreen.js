@@ -3,6 +3,7 @@ import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
 import DataInputComponent from "../../components/DataInputComponent";
 import {get, newObject, set} from "../../Data/DAO";
 import {Site} from "../../models/SiteModel";
+import * as Location from 'expo-location';
 
 export default function SiteEntryScreen({route, navigation}) {
     const {destination} = route.params
@@ -38,8 +39,7 @@ export default function SiteEntryScreen({route, navigation}) {
     const opts2 = [
         {title: "Name", value: name, callback: setName},
         {title: "Water Type", options: ["Salt", "Fresh"], value: waterType, callback: setWaterType},
-        {title: "Latitude", value: latitude, callback: setLatitude},
-        {title: "Longitude", value: longitude, callback: setLongitude},
+        {title: "Location", location: [latitude, longitude], callbacks: [setLatitude, setLongitude]},
         {title: "Default Depth", intervals: [1, 10, 25], value: defaultDepth, callback: setDefaultDepth},
     ]
 

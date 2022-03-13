@@ -3,6 +3,8 @@ import CardComponent from "../../components/CardComponent";
 import {StyleSheet, View, FlatList, Image} from "react-native";
 import {deleteObject, getAll} from "../../Data/DAO";
 import {useFocusEffect} from "@react-navigation/native";
+import Clipboard from '@react-native-clipboard/clipboard';
+
 
 export default function DiveSelectScreen({route, navigation}) {
     const {destination} = route.params
@@ -37,6 +39,17 @@ export default function DiveSelectScreen({route, navigation}) {
     const editItem = (id) =>
         navigation.navigate("entryDive", {destination: destination, dive_id: id})
 
+    const exportItem = (item) => Clipboard.setString(JSON.stringify(item))
+
+    const importItem = () => {
+        Clipboard.getString().then((text)=>
+            set("tempDive",text).then(
+                navigation.navigate("entryDive", {destination: destination, dive_id: "tempDive"})
+            ).catch(e=>console.log(e))
+        ).catch(e=>console.log(e))
+    }
+
+
     const renderItem = ({item}) => {
         let dt = new Date(item.dateTime)
         return <CardComponent
@@ -46,7 +59,8 @@ export default function DiveSelectScreen({route, navigation}) {
             subtitle3={item.duration+" min"}
             pressAction={() => selectAction(item.id)}
             editAction={()=> editItem(item.id)}
-            deleteAction={() => deleteItem(item.id)}/>
+            deleteAction={() => deleteItem(item.id)}
+            exportAction={() => exportItem(item)}/>
     }
 
     return (
@@ -57,7 +71,8 @@ export default function DiveSelectScreen({route, navigation}) {
                     subtitle1= ""
                     subtitle2= ""
                     subtitle3= ""
-                    pressAction={() => navigation.navigate("entryDive", {destination: destination})}/>
+                    pressAction={() => navigation.navigate("entryDive", {destination: destination})}
+                    importAction={importItem}/>
             </View>
             <View style={styles.old}>
                 {ready ?

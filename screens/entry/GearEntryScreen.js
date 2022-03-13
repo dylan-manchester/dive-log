@@ -37,7 +37,7 @@ export default function GearEntryScreen({route, navigation}) {
 
     const opts2 = [
         {title: "Name", value: name, callback: setName},
-        {title: "Cylinder Type", options: ["Aluminum", "Steel"], value: cylinderType, callback: setCylinderType},
+        {title: "Cylinder Type", options: ["Aluminum", "Steel", "CCR"], value: cylinderType, callback: setCylinderType},
         {title: "Cylinder Size", intervals: [1, 10, 25], value: cylinderSize, callback: setCylinderSize},
         {title: "Default Weight", intervals: [1, 10, 25], value: defaultWeight, callback: setDefaultWeight},
         {title: "Default Starting PSI", intervals: [50, 100, 500], value: defaultStaringPSI, callback: setDefaultStaringPSI},
