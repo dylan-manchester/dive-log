@@ -4,10 +4,14 @@ import DataInputComponent from "../../components/DataInputComponent";
 import {get, set, newObject} from "../../Data/DAO";
 import {Dive} from "../../models/DiveModel";
 import DateTimePicker from '@react-native-community/datetimepicker';
+import {useFocusEffect} from "@react-navigation/native";
 
 export default function DiveEntryScreen({route, navigation}) {
     const {destination} = route.params
     const constant = false
+    const [trigger, setTrigger] = useState(true)
+    const [ready, setReady] = useState(false)
+    const [settings, setSettings] = useState()
     const [id, setID] = useState()
     const [dateTime, setDateTime] = useState(new Date())
     const [mode, setMode] = useState('date')
@@ -19,8 +23,15 @@ export default function DiveEntryScreen({route, navigation}) {
     const [depth, setDepth] = useState(0)
     const [duration, setDuration] = useState(0)
     const [weight, setWeight] = useState(0)
+    const [exposure, setExposure] = useState()
     const [startingPSI, setStartingPSI] = useState(0)
     const [endingPSI, setEndingPSI] = useState(0)
+    const [notes1, setNotes1] = useState('')
+    const [notes2, setNotes2] = useState('')
+    const [notes3, setNotes3] = useState('')
+    const [notes4, setNotes4] = useState('')
+    const [notes5, setNotes5] = useState('')
+
 
     const clearState = ()=>{
         setDateTime(new Date())
@@ -31,8 +42,14 @@ export default function DiveEntryScreen({route, navigation}) {
         setDepth(0)
         setDuration(0)
         setWeight(0)
+        setExposure(null)
         setStartingPSI(0)
         setEndingPSI(0)
+        setNotes1('')
+        setNotes2('')
+        setNotes3('')
+        setNotes4('')
+        setNotes5('')
     }
 
     useEffect(() => {
@@ -48,8 +65,14 @@ export default function DiveEntryScreen({route, navigation}) {
                     setDepth(dive.depth)
                     setDuration(dive.duration)
                     setWeight(dive.weight)
+                    setExposure(dive.exposure)
                     setStartingPSI(dive.startingPSI)
                     setEndingPSI(dive.endingPSI)
+                    setNotes1(dive.notes1)
+                    setNotes2(dive.notes2)
+                    setNotes3(dive.notes3)
+                    setNotes4(dive.notes4)
+                    setNotes5(dive.notes5)
                 }).catch(e=>console.log(e))
         }
     }, [route.params?.dive_id]);
@@ -67,7 +90,7 @@ export default function DiveEntryScreen({route, navigation}) {
                         }
                     }).catch(e=>console.log(e))
             }
-        })
+        }).catch(e=>console.log(e))
         get("favGear").then((rv)=>{
             if (rv != null) {
                 get(rv).then(
@@ -80,9 +103,17 @@ export default function DiveEntryScreen({route, navigation}) {
                         }
                     }).catch(e=>console.log(e))
             }
-        })
+        }).catch(e=>console.log(e))
     }, [constant]);
 
+    useFocusEffect(
+        React.useCallback(()=>{
+            get("settings").then((rv)=>{
+                setSettings(rv)
+                setReady(true)
+            }).catch(e=>console.log(e))
+        })
+    )
 
 
     useEffect(() => {
@@ -109,13 +140,19 @@ export default function DiveEntryScreen({route, navigation}) {
     }, [route.params?.gear_id]);
 
 
-    const opts2 = [
-        {title: "Depth", intervals: [1, 10, 25], value: depth, callback: setDepth},
-        {title: "Duration", intervals: [1, 10, 25], value: duration, callback: setDuration},
-        {title: "Weight", intervals: [1, 10, 25], value: weight, callback: setWeight},
-        {title: "Starting PSI", intervals: [50, 100, 500], value: startingPSI, callback: setStartingPSI},
-        {title: "Ending PSI", intervals: [50, 100, 500], value: endingPSI, callback: setEndingPSI}
-    ]
+    const opts2 = ready ? [
+        {toggle: settings["Show Depth"], title: "Depth", intervals: [1, 10, 25], value: depth, callback: setDepth},
+        {toggle: settings["Show Duration"], title: "Duration", intervals: [1, 10, 25], value: duration, callback: setDuration},
+        {toggle: settings["Show Weight"], title: "Weight", intervals: [1, 10, 25], value: weight, callback: setWeight},
+        {toggle: settings["Show Exposure"], title: "Exposure Suit", options: ["3mm", "5mm", "7mm", "dry"], value: exposure, callback: setExposure},
+        {toggle: settings["Show PSI"], title: "Starting PSI", intervals: [50, 100, 500], value: startingPSI, callback: setStartingPSI},
+        {toggle: settings["Show PSI"], title: "Ending PSI", intervals: [50, 100, 500], value: endingPSI, callback: setEndingPSI},
+        {toggle: settings["Show Notes 1"], title: settings["Note 1 Name"], value: notes1, callback: setNotes1},
+        {toggle: settings["Show Notes 2"], title: settings["Note 2 Name"], value: notes2, callback: setNotes2},
+        {toggle: settings["Show Notes 3"], title: settings["Note 3 Name"], value: notes3, callback: setNotes3},
+        {toggle: settings["Show Notes 4"], title: settings["Note 4 Name"], value: notes4, callback: setNotes4},
+        {toggle: settings["Show Notes 5"], title: settings["Note 5 Name"], value: notes5, callback: setNotes5},
+    ] : []
 
     const onChange = (event, selectedDateTime) => {
         const currentDateTime = selectedDateTime || dateTime;
@@ -140,7 +177,7 @@ export default function DiveEntryScreen({route, navigation}) {
     }
 
     return (
-        <ScrollView style= {styles.container}>
+        <ScrollView style= {styles.container} showsVerticalScrollIndicator={false}>
             <Pressable style={({pressed})=>[pressed ? styles.pressed : styles.unpressed ,styles.pressable]} onPress={()=>showMode('date')} title="Show date picker!">
                 <Text>Select Date</Text>
                 <Text>{String(dateTime.getMonth()).padStart(2,'0')+"/"+String(dateTime.getDate()).padStart(2,'0')+"/"+dateTime.getFullYear()}</Text>
@@ -164,7 +201,7 @@ export default function DiveEntryScreen({route, navigation}) {
                 <Text>Select a Gear Configuration</Text>
                 <Text>{gearName}</Text>
             </Pressable>
-            {opts2.map((value) => <DataInputComponent key={value.title} props={value}/>)}
+            {ready ? opts2.map((value) => <DataInputComponent key={value.title} props={value}/>) : null}
             <Pressable style={({pressed})=>[pressed ? styles.pressed : styles.unpressed ,styles.pressable]} onPress={submit}>
                 <Text>Submit</Text>
             </Pressable>

@@ -47,11 +47,6 @@ export default function LocationInputComponent({title, location, setterCallbacks
             <View style={styles.description}>
                 <Text>{title}</Text>
             </View>
-            <Pressable style={({pressed})=>[pressed ? styles.pressed : styles.unpressed ,styles.pressable]} onPress={()=>alert("open map")}>
-                <Text style={styles.text}>
-                    Open Map
-                </Text>
-            </Pressable>
             <Pressable style={({pressed})=>[pressed ? styles.pressed : styles.unpressed ,styles.pressable]} onPress={getLocation}>
                 <Text style={styles.text}>
                     Use Current Location

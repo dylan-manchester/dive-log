@@ -8,6 +8,7 @@ import LocationInputComponent from "./LocationInputComponent";
 export default function ({props}) {
 
     return (
+        props.toggle == null || props.toggle === true ?
         <View style={styles.container}>
             {props.intervals != null ?
                 <NumericInputComponent
@@ -30,7 +31,7 @@ export default function ({props}) {
                             title={props.title}
                             value={props.value}
                             setterCallback={props.callback}/>}
-        </View>
+        </View> : null
     )
 }
 
