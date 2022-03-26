@@ -1,9 +1,11 @@
-import {StyleSheet, Text, TextInput, View, Pressable} from 'react-native'
+import {StyleSheet, Dimensions, Text, TextInput, View, Pressable} from 'react-native'
+import {scale} from "../Data/scaling"
 import {useEffect, useState} from "react";
 
 
 export default function NumericInputComponent({title, value, intervals, setterCallback}) {
     const [text, setText] = useState(0)
+    const width = Dimensions.get('window').width;
 
     useEffect(()=>{
         if (value) {
@@ -25,7 +27,7 @@ export default function NumericInputComponent({title, value, intervals, setterCa
             </View>
             <View style={styles.content}>
                 {intervals.map((value, index, array) =>
-                    <Pressable key={(-1*array[array.length-index-1]).toString()} style={({pressed})=>[pressed ? styles.pressed : styles.unpressed ,styles.pressable]} onPress={()=>onChange(parseInt(text)-array[array.length-index-1])}>
+                    <Pressable key={(-1*array[array.length-index-1]).toString()} style={({pressed})=>[pressed ? styles.pressed : styles.unpressed, styles.pressable, {backgroundColor: 'rgb(0,0,'+(30*(index)+90).toString()+')' }]} onPress={()=>onChange(parseInt(text)-array[array.length-index-1])}>
                         <Text style={styles.text}>-{array[array.length-index-1]}</Text>
                     </Pressable>)
                 }
@@ -36,7 +38,7 @@ export default function NumericInputComponent({title, value, intervals, setterCa
                         onChangeText={onChange}/>
                 </View>
                 {intervals.map((value, index, array) =>
-                    <Pressable key={value.toString()} style={({pressed})=>[pressed ? styles.pressed : styles.unpressed ,styles.pressable]} onPress={()=>onChange(parseInt(text)+value)}>
+                    <Pressable key={value.toString()} style={({pressed})=>[pressed ? styles.pressed : styles.unpressed ,styles.pressable, {backgroundColor: 'rgb(0,0,'+(30*(array.length-index-1)+90).toString()+')' }]} onPress={()=>onChange(parseInt(text)+value)}>
                         <Text style={styles.text}>+{value}</Text>
                     </Pressable>)
                 }
@@ -60,8 +62,8 @@ const styles = StyleSheet.create({
         borderColor: 'grey',
         margin: 2.5,
         padding: 2,
-        height: 45,
-        width: 45,
+        height: Dimensions.get('window').width * .1,
+        width: Dimensions.get('window').width * .1,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -75,7 +77,7 @@ const styles = StyleSheet.create({
     },
 
     text: {
-        fontSize: 10,
+        fontSize: Dimensions.get('window').width * .025,
         color: 'white',
     },
 
@@ -83,8 +85,8 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         textAlignVertical: 'center',
         backgroundColor: 'lightgrey',
-        height: 45,
-        width: 70,
+        height: Dimensions.get('window').width * .1,
+        width: Dimensions.get('window').width * .15,
         margin: 2.5,
         padding: 2,
     },

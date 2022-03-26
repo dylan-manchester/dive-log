@@ -41,6 +41,13 @@ export default function App() {
             "Show Notes 3": true,
             "Show Notes 4": true,
             "Show Notes 5": true,
+            "Show Water Type": true,
+            "Show Location": true,
+            "Show Default Depth": true,
+            "Show Cylinder Type": true,
+            "Show Cylinder Size": true,
+            "Show Default Weight": true,
+            "Show Default PSI": true,
         }))
     }, [constant])
 
@@ -48,66 +55,66 @@ export default function App() {
     return (
         <MenuProvider>
             <NavigationContainer>
-                <Stack.Navigator
-                    screenOptions={{
-                        headerStyle: {
+                <Stack.Navigator>
+                    <Stack.Group
+                        screenOptions={{
+                            headerStyle: {
                             backgroundColor: '#02adec',
                         },
-                        headerTintColor: '#fff',
-                        headerTitleStyle: {
-                            fontWeight: 'bold',
+                            headerTintColor: '#fff',
+                            headerTitleStyle: {fontWeight: 'bold',
                         },
-                        headerRight: () => (
+                            headerRight: () => (
                             <Pressable onPress={()=>setModalVisible(true)}>
                                 <Image source={require("./assets/settings.png")}/>
-                            </Pressable>)
-                    }}>
-                    <Stack.Screen
-                        name="home"
-                        component={HomeScreen}
-                        options={{title: "Home"}}/>
-                    <Stack.Screen
-                        name="entryDive"
-                        component={DiveEntryScreen}
-                        initialParams={{ destination: "home"}}
-                        options={{title: "Dive Entry"}}/>
-                    <Stack.Screen
-                        name="selectDive"
-                        component={DiveSelectScreen}
-                        initialParams={{ destination: "viewDive"}}
-                        options={{title: "Select a Dive"}}/>
-                    <Stack.Screen
-                        name="viewDive"
-                        component={DiveViewScreen}
-                        options={{title: "View Dive"}}/>
-                    <Stack.Screen
-                        name="entryGear"
-                        component={GearEntryScreen}
-                        initialParams={{ destination: "home"}}
-                        options={{title: "Gear Entry"}}/>
-                    <Stack.Screen
-                        name="selectGear"
-                        component={GearSelectScreen}
-                        initialParams={{ destination: "viewGear"}}
-                        options={{title: "Select Gear"}}/>
-                    <Stack.Screen
-                        name="viewGear"
-                        component={GearViewScreen}
-                        options={{title: "View Gear"}}/>
-                    <Stack.Screen
-                        name="entrySite"
-                        component={SiteEntryScreen}
-                        initialParams={{ destination: "home"}}
-                        options={{title: "Site Entry"}}/>
-                    <Stack.Screen
-                        name="selectSite"
-                        component={SiteSelectScreen}
-                        initialParams={{ destination: "viewSite"}}
-                        options={{title: "Select a Site"}}/>
-                    <Stack.Screen
-                        name="viewSite"
-                        component={SiteViewScreen}
-                        options={{title: "View Site"}}/>
+                            </Pressable>)}}>
+                        <Stack.Screen
+                            name="home"
+                            component={HomeScreen}
+                            options={{title: "Home"}}/>
+                        <Stack.Screen
+                            name="entryDive"
+                            component={DiveEntryScreen}
+                            initialParams={{ destination: "home"}}
+                            options={{title: "Dive Entry"}}/>
+                        <Stack.Screen
+                            name="selectDive"
+                            component={DiveSelectScreen}
+                            initialParams={{ destination: "viewDive"}}
+                            options={{title: "Select a Dive"}}/>
+                        <Stack.Screen
+                            name="viewDive"
+                            component={DiveViewScreen}
+                            options={{title: "View Dive"}}/>
+                        <Stack.Screen
+                            name="entryGear"
+                            component={GearEntryScreen}
+                            initialParams={{ destination: "home"}}
+                            options={{title: "Gear Entry"}}/>
+                        <Stack.Screen
+                            name="selectGear"
+                            component={GearSelectScreen}
+                            initialParams={{ destination: "viewGear"}}
+                            options={{title: "Select Gear"}}/>
+                        <Stack.Screen
+                            name="viewGear"
+                            component={GearViewScreen}
+                            options={{title: "View Gear"}}/>
+                        <Stack.Screen
+                            name="entrySite"
+                            component={SiteEntryScreen}
+                            initialParams={{ destination: "home"}}
+                            options={{title: "Site Entry"}}/>
+                        <Stack.Screen
+                            name="selectSite"
+                            component={SiteSelectScreen}
+                            initialParams={{ destination: "viewSite"}}
+                            options={{title: "Select a Site"}}/>
+                        <Stack.Screen
+                            name="viewSite"
+                            component={SiteViewScreen}
+                            options={{title: "View Site"}}/>
+                    </Stack.Group>
                 </Stack.Navigator>
             </NavigationContainer>
             <Modal

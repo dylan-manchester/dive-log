@@ -96,7 +96,6 @@ async function getMultiple(keys) {
         }
         return null
     } catch(e) {
-        // read error
         console.log(e)
     }
 }
@@ -105,7 +104,7 @@ async function getMultiple(keys) {
 async function setObject(value) {
     let key = null
     try {
-        // Generate key
+        // Generate Unique Key
         while (true) {
             key = uuid.v4().toString()
             let v = await get(key)

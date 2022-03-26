@@ -4,9 +4,14 @@ import DataInputComponent from "../../components/DataInputComponent";
 import {get, newObject, set} from "../../Data/DAO";
 import {Site} from "../../models/SiteModel";
 import * as Location from 'expo-location';
+import {useFocusEffect, useIsFocused} from "@react-navigation/native";
 
 export default function SiteEntryScreen({route, navigation}) {
-    const {destination} = route.params
+    const {destination} = route.params;
+    const focus = useIsFocused();
+    const [trigger, setTrigger] = useState(true);
+    const [ready, setReady] = useState(false);
+    const [settings, setSettings] = useState();
     const [id, setID] = useState();
     const [name, setName] = useState('');
     const [latitude, setLatitude] = useState('')
@@ -36,12 +41,21 @@ export default function SiteEntryScreen({route, navigation}) {
         }
     }, [route.params?.site_id]);
 
-    const opts2 = [
-        {title: "Name", value: name, callback: setName},
-        {title: "Water Type", options: ["Salt", "Fresh"], value: waterType, callback: setWaterType},
-        {title: "Location", location: [latitude, longitude], callbacks: [setLatitude, setLongitude]},
-        {title: "Default Depth", intervals: [1, 10, 25], value: defaultDepth, callback: setDefaultDepth},
-    ]
+    useFocusEffect(
+        React.useCallback(()=>{
+            get("settings").then((rv)=>{
+                setSettings(rv)
+                setReady(true)
+            }).catch(e=>console.log(e))
+        },[focus])
+    )
+
+    const opts2 = ready ? [
+        {toggle: true, title: "Name", value: name, callback: setName},
+        {toggle: settings["Show Water Type"], title: "Water Type", options: ["Salt", "Fresh"], value: waterType, callback: setWaterType},
+        {toggle: settings["Show Location"], title: "Location", location: [latitude, longitude], callbacks: [setLatitude, setLongitude]},
+        {toggle: settings["Show Default Depth"], title: "Default Depth", intervals: [1, 10, 25], value: defaultDepth, callback: setDefaultDepth},
+    ] : []
 
     const submit = () => {
         const value = new Site(name, latitude, longitude, waterType, defaultDepth)
@@ -56,7 +70,7 @@ export default function SiteEntryScreen({route, navigation}) {
 
     return (
         <ScrollView style= {styles.container}>
-            {opts2.map((value) => <DataInputComponent key={value.title} props={value}/>)}
+            {ready ? opts2.map((value) => <DataInputComponent key={value.title} props={value}/>) : null}
             <Pressable style={({pressed})=>[pressed ? styles.pressed : styles.unpressed ,styles.pressable]} onPress={submit}>
                 <Text style={styles.text}>
                     Submit

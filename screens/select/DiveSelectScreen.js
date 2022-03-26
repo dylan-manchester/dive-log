@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import CardComponent from "../../components/CardComponent";
 import {StyleSheet, View, FlatList, Image} from "react-native";
-import {deleteObject, getAll} from "../../Data/DAO";
+import {deleteObject, getAll, get, set} from "../../Data/DAO";
 import {useFocusEffect} from "@react-navigation/native";
 import Clipboard from '@react-native-clipboard/clipboard';
 
@@ -12,15 +12,19 @@ export default function DiveSelectScreen({route, navigation}) {
         navigation.navigate(destination, {dive_id: id})
         else navigation.navigate("entry")
     }
+    const [settings, setSettings] = useState()
     const [dives, setDives] = useState([]);
     const [ready, setReady] = useState(false);
     const [trigger, setTrigger] = useState(false);
 
     useFocusEffect(
         React.useCallback(() => {
-            getAll("dives", (rv) => {
-                setDives(rv)
-                setReady(true)
+            get("settings").then((rv)=>{
+                setSettings(rv)
+                getAll("dives", (rv) => {
+                    setDives(rv)
+                    setReady(true)
+                })
             })
         },[trigger])
     )
@@ -55,8 +59,8 @@ export default function DiveSelectScreen({route, navigation}) {
         return <CardComponent
             title={String(dt.getMonth()).padStart(2,'0')+"/"+String(dt.getDate()).padStart(2,'0')+"/"+ dt.getFullYear()+" "+ String(dt.getHours()).padStart(2,'0')+":"+ String(dt.getMinutes()).padStart(2,'0')}
             subtitle1={item.siteName}
-            subtitle2={item.depth+" ft"}
-            subtitle3={item.duration+" min"}
+            subtitle2={settings["Show Depth"] ? item.depth+" ft" : ""}
+            subtitle3={settings["Show Duration"] ? item.duration+" min" : ""}
             pressAction={() => selectAction(item.id)}
             editAction={()=> editItem(item.id)}
             deleteAction={() => deleteItem(item.id)}

@@ -3,9 +3,14 @@ import {Pressable, StyleSheet, Text, ScrollView} from 'react-native';
 import DataInputComponent from "../../components/DataInputComponent";
 import {get, newObject, set} from "../../Data/DAO";
 import {Gear} from "../../models/GearModel";
+import {useFocusEffect, useIsFocused} from "@react-navigation/native";
 
 export default function GearEntryScreen({route, navigation}) {
-    const {destination} = route.params
+    const {destination} = route.params;
+    const focus = useIsFocused();
+    const [trigger, setTrigger] = useState(true);
+    const [ready, setReady] = useState(false);
+    const [settings, setSettings] = useState();
     const [name, setName] = useState('');
     const [id, setID] = useState()
     const [cylinderType, setCylinderType] = useState('')
@@ -35,14 +40,22 @@ export default function GearEntryScreen({route, navigation}) {
         }
     }, [route.params?.gear_id]);
 
-    const opts2 = [
-        {title: "Name", value: name, callback: setName},
-        {title: "Cylinder Type", options: ["Aluminum", "Steel", "CCR"], value: cylinderType, callback: setCylinderType},
-        {title: "Cylinder Size", intervals: [1, 10, 25], value: cylinderSize, callback: setCylinderSize},
-        {title: "Default Weight", intervals: [1, 10, 25], value: defaultWeight, callback: setDefaultWeight},
-        {title: "Default Starting PSI", intervals: [50, 100, 500], value: defaultStaringPSI, callback: setDefaultStaringPSI},
+    useFocusEffect(
+        React.useCallback(()=>{
+            get("settings").then((rv)=>{
+                setSettings(rv)
+                setReady(true)
+            }).catch(e=>console.log(e))
+        },[focus])
+    )
 
-    ]
+    const opts2 = ready ? [
+        {toggle: true, title: "Name", value: name, callback: setName},
+        {toggle: settings["Show Cylinder Type"], title: "Cylinder Type", options: ["Aluminum", "Steel", "CCR"], value: cylinderType, callback: setCylinderType},
+        {toggle: settings["Show Cylinder Size"], title: "Cylinder Size", intervals: [1, 10, 25], value: cylinderSize, callback: setCylinderSize},
+        {toggle: settings["Show Default Weight"], title: "Default Weight", intervals: [1, 10, 25], value: defaultWeight, callback: setDefaultWeight},
+        {toggle: settings["Show Default PSI"], title: "Default Starting PSI", intervals: [50, 100, 500], value: defaultStaringPSI, callback: setDefaultStaringPSI},
+    ] : []
 
     const submit = () => {
         const value = new Gear(name, cylinderType, cylinderSize, defaultWeight, defaultStaringPSI)
@@ -57,7 +70,7 @@ export default function GearEntryScreen({route, navigation}) {
 
     return (
         <ScrollView style= {styles.container}>
-            {opts2.map((value) => <DataInputComponent key={value.title} props={value}/>)}
+            {ready ? opts2.map((value) => <DataInputComponent key={value.title} props={value}/>) : null}
             <Pressable style={({pressed})=>[pressed ? styles.pressed : styles.unpressed ,styles.pressable]} onPress={submit}>
                 <Text style={styles.text}>
                     Submit

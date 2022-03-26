@@ -8,16 +8,20 @@ export default function GearSelectScreen({route, navigation}) {
     const {destination} = route.params
     const selectAction = (id) => navigation.navigate(destination, {gear_id: id})
     const [gearConfigs, setGearConfigs] = useState([]);
+    const [settings, setSettings] = useState()
     const [ready, setReady] = useState(false);
     const [trigger, setTrigger] = useState(false);
     const [favorite, setFavorite] = useState(null);
 
     useFocusEffect(
         React.useCallback(() => {
-            get("favGear").then(rv=>setFavorite(rv)).catch(e=>console.log(e))
-            getAll("gear", (rv) => {
-                setGearConfigs(rv)
-                setReady(true)
+            get("settings").then((rv)=>{
+                setSettings(rv)
+                get("favGear").then(rv=>setFavorite(rv)).catch(e=>console.log(e))
+                getAll("gear", (rv) => {
+                    setGearConfigs(rv)
+                    setReady(true)
+                })
             })
         },[trigger])
     )
@@ -46,8 +50,8 @@ export default function GearSelectScreen({route, navigation}) {
     const renderItem = ({item}) =>
         <CardComponent
             title={item.name}
-            subtitle1= {item.cylinderType}
-            subtitle2= {item.cylinderSize}
+            subtitle1= {settings["Show Cylinder Type"] ? item.cylinderType : ""}
+            subtitle2= {settings["Show Cylinder Size"] ? item.cylinderSize: ""}
             subtitle3= ""
             favorite={item.id === favorite}
             pressAction={() => selectAction(item.id)}

@@ -4,11 +4,12 @@ import DataInputComponent from "../../components/DataInputComponent";
 import {get, set, newObject} from "../../Data/DAO";
 import {Dive} from "../../models/DiveModel";
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {useFocusEffect} from "@react-navigation/native";
+import {useFocusEffect, useIsFocused} from "@react-navigation/native";
 
 export default function DiveEntryScreen({route, navigation}) {
     const {destination} = route.params
     const constant = false
+    const focus = useIsFocused();
     const [trigger, setTrigger] = useState(true)
     const [ready, setReady] = useState(false)
     const [settings, setSettings] = useState()
@@ -112,7 +113,7 @@ export default function DiveEntryScreen({route, navigation}) {
                 setSettings(rv)
                 setReady(true)
             }).catch(e=>console.log(e))
-        })
+        },[focus])
     )
 
 
@@ -166,7 +167,7 @@ export default function DiveEntryScreen({route, navigation}) {
     };
 
     const submit = () => {
-        const value = new Dive(dateTime, siteID, siteName, gearID, gearName, depth, duration, weight, startingPSI, endingPSI)
+        const value = new Dive(dateTime, siteID, siteName, gearID, gearName, depth, duration, weight, exposure, startingPSI, endingPSI, notes1, notes2, notes3, notes4, notes5)
         if (id == null) {
             newObject("dives", value).then((key) => navigation.navigate("selectDive", {destination: destination}))
         } else {

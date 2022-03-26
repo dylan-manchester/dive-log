@@ -12,6 +12,7 @@ export default function SettingInputComponent({props}) {
         <View style={styles.container}>
             {props.value === true || props.value === false ?
                 <SwitchInputComponent
+                    key={props.value.toString()}
                     title={props.title}
                     value={props.value}
                     setterCallback={props.callback}/>

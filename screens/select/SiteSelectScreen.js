@@ -8,6 +8,7 @@ export default function SiteSelectScreen({route, navigation}) {
     const {destination} = route.params
     const selectAction = (id) => navigation.navigate(destination, {site_id: id})
     const [sites, setSites] = useState([]);
+    const [settings, setSettings] = useState()
     const [ready, setReady] = useState(false);
     const [trigger, setTrigger] = useState(false);
     const [favorite, setFavorite] = useState(null);
@@ -15,10 +16,13 @@ export default function SiteSelectScreen({route, navigation}) {
     useFocusEffect(
         React.useCallback(
         () => {
-            get("favSite").then(rv=>setFavorite(rv)).catch(e=>console.log(e))
-            getAll("sites", (rv) => {
-                setSites(rv)
-                setReady(true)
+            get("settings").then((rv)=>{
+                setSettings(rv)
+                get("favSite").then(rv=>setFavorite(rv)).catch(e=>console.log(e))
+                getAll("sites", (rv) => {
+                    setSites(rv)
+                    setReady(true)
+                })
             })
         },[trigger]))
 
@@ -44,9 +48,9 @@ export default function SiteSelectScreen({route, navigation}) {
     const renderItem = ({item}) =>
         <CardComponent
             title={item.name}
-            subtitle1={"("+item.latitude+", "+item.longitude+")"}
-            subtitle2={item.waterType}
-            subtitle3={item.defaultDepth+" ft"}
+            subtitle1={settings["Show Location"] ? "("+item.latitude+", "+item.longitude+")" : ""}
+            subtitle2={settings["Show Water Type"] ? item.waterType : ""}
+            subtitle3={settings["Show Default Depth"] ? item.defaultDepth+" ft" : ""}
             favorite={item.id === favorite}
             pressAction={() => selectAction(item.id)}
             editAction={() => editItem(item.id)}
