@@ -1,20 +1,15 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import uuid from 'react-native-uuid';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from "expo-sharing";
 
-export function getAll(topLevelKey, callback) {
+export async function getAll(topLevelKey) {
     console.log("Getting all "+topLevelKey)
-    wait(100).then(
-        ()=> get(topLevelKey).then(
-            (ids) => {
-                if (ids) {
-                    getMultiple(ids).then(
-                        (s) => {
-                            callback(s)
-                        }
-                    ).catch(e => console.log(e))
-                }
-            }
-        ).catch(e => console.log(e)))
+    const ids = await get(topLevelKey);
+    if (ids) {
+        return await getMultiple(ids);
+    }
+    return []
 }
 
 export async function newObject(type, value) {
@@ -29,8 +24,7 @@ export async function deleteObject(topLevelKey, key) {
     try {
         let proceed = true
         if (topLevelKey !== "dives") {
-            let diveIds = await get("dives")
-            let dives = await getMultiple(diveIds)
+            let dives = await getAll("dives")
             let filtered = []
             if (topLevelKey === "sites") {
                 filtered = dives.filter((value, index, array) => value.siteID !== key)
@@ -94,7 +88,7 @@ async function getMultiple(keys) {
             values.map((obj) => rv.push(JSON.parse(obj[1])))
             return rv
         }
-        return null
+        return []
     } catch(e) {
         console.log(e)
     }
@@ -120,4 +114,55 @@ async function setObject(value) {
 
 export const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
+}
+
+
+
+
+
+
+
+
+
+const flattenJSON = (obj = {}, res = {}, extraKey = '') => {
+    for(const key in obj){
+        if(typeof obj[key] !== 'object'){
+            res[extraKey + key] = obj[key];
+        }else{
+            flattenJSON(obj[key], res, `${extraKey}${key}__`);
+        };
+    };
+    return res;
+};
+
+const JSONtoCSV = (obj = {}) => {
+    let replacer = (key, value) => value === null ? '' : value // specify how you want to handle null values here
+    let header = Object.keys(obj[0])
+    let csv = [
+        header.join(','), // header row first
+        ...obj.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
+    ].join('\r\n')
+    return csv
+}
+export async function exportAllDives() {
+    const dives = await getAll("dives");
+    let flatDives = await Promise.all(dives.map(async (dive)=>{
+        delete dive.id
+        let site = await get(dive.siteID)
+        dive.site = site
+        delete dive.site.id
+        delete dive.siteID
+        let gear = await get(dive.gearID)
+        dive.gear = gear
+        delete dive.gear.id
+        delete dive.gearID
+        let flatDive = flattenJSON(dive, {}, '')
+        return flatDive
+        }))
+    let csv = JSONtoCSV(flatDives);
+    console.log("CSV:\n"+csv);
+    let fileURI = FileSystem.documentDirectory+"export.csv"
+    await FileSystem.writeAsStringAsync(fileURI, csv)
+    await Sharing.shareAsync(fileURI)
+    return csv;
 }

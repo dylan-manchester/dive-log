@@ -17,10 +17,12 @@ export default function GearSelectScreen({route, navigation}) {
 
     useFocusEffect(
         React.useCallback(() => {
-            get("favGear").then(rv=>setFavorite(rv)).catch(e=>console.log(e))
-            getAll("gear", (rv) => {
-                setGearConfigs(rv)
-                setReady(true)
+            get("favGear").then(rv=>{
+                setFavorite(rv)
+                getAll("gear").then((rv) => {
+                    setGearConfigs(rv)
+                    setReady(true)
+                })
             })
         },[trigger])
     )

@@ -28,7 +28,7 @@ export default function DiveSelectScreen({route, navigation}) {
         React.useCallback(() => {
             get("settings").then((rv)=>{
                 setSettings(rv)
-                getAll("dives", (rv) => {
+                getAll("dives").then((rv) => {
                     setDives(rv)
                     setReady(true)
                 })

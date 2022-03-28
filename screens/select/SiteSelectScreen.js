@@ -17,10 +17,12 @@ export default function SiteSelectScreen({route, navigation}) {
 
     useFocusEffect(
         React.useCallback(() => {
-            get("favSite").then(rv=>setFavorite(rv)).catch(e=>console.log(e))
-            getAll("sites", (rv) => {
-                setSites(rv)
-                setReady(true)
+            get("favSite").then(rv=> {
+                setFavorite(rv)
+                getAll("sites").then((rv) => {
+                    setSites(rv)
+                    setReady(true)
+                })
             })
         },[trigger]))
 
