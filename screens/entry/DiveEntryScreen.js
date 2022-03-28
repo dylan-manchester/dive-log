@@ -5,12 +5,12 @@ import {get, set, newObject} from "../../Data/DAO";
 import {Dive} from "../../models/DiveModel";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {useFocusEffect, useIsFocused} from "@react-navigation/native";
+import {EventEmitter} from "../../Data/EventEmitter"
 
 export default function DiveEntryScreen({route, navigation}) {
     const {destination} = route.params
     const constant = false
-    const focus = useIsFocused();
-    const [trigger, setTrigger] = useState(true)
+    const [trigger, setTrigger] = useState(0)
     const [ready, setReady] = useState(false)
     const [settings, setSettings] = useState()
     const [id, setID] = useState()
@@ -107,37 +107,52 @@ export default function DiveEntryScreen({route, navigation}) {
         }).catch(e=>console.log(e))
     }, [constant]);
 
-    useFocusEffect(
-        React.useCallback(()=>{
-            get("settings").then((rv)=>{
+    useEffect(()=>{
+        EventEmitter.subscribe('refreshDiveEntry', (r)=>setTrigger(r))
+        return ()=>{EventEmitter.unsubscribe('refreshDiveEntry')}
+    }, [constant])
+
+    useEffect(()=>{
+        let isMounted = true
+        setReady(false)
+        get("settings").then((rv)=>{
+            if (isMounted) {
                 setSettings(rv)
                 setReady(true)
-            }).catch(e=>console.log(e))
-        },[focus])
-    )
+            }
+            return () => {isMounted = false}
+        })},[trigger])
 
 
     useEffect(() => {
         if (route.params?.site_id) {
-            setSiteID(route.params.site_id)
+            let isMounted = true
             get(route.params.site_id).then(
                 site=>{
-                    setSiteName(site.name)
-                    setDepth(site.defaultDepth)
-                }).catch(e=>console.log(e))
+                    if (isMounted) {
+                        setSiteName(site.name)
+                        setDepth(site.defaultDepth)
+                        setSiteID(route.params.site_id)
+                    }
+                })
         }
+        return () => {isMounted = false}
     }, [route.params?.site_id]);
 
     useEffect(() => {
         if (route.params?.gear_id) {
-            setGearID(route.params.gear_id)
+            let isMounted = true
             get(route.params.gear_id).then(
                 gear=>{
-                    setGearName(gear.name)
-                    setStartingPSI(gear.defaultStartingPSI)
-                    setWeight(gear.defaultWeight)
-                }).catch(e=>console.log(e))
+                    if (isMounted) {
+                        setGearName(gear.name)
+                        setStartingPSI(gear.defaultStartingPSI)
+                        setWeight(gear.defaultWeight)
+                        setGearID(route.params.gear_id)
+                    }
+                })
         }
+        return () => {isMounted = false}
     }, [route.params?.gear_id]);
 
 

@@ -1,26 +1,38 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View, ScrollView, Image} from 'react-native';
+import {StyleSheet, Text, View, Image} from 'react-native';
 import {get, wait} from "../../Data/DAO";
 import {Gear} from "../../models/GearModel";
+import {EventEmitter} from "../../Data/EventEmitter"
 
-export default function GearViewScreen({route, navigation}) {
+export default function GearViewScreen({route}) {
     const {gear_id} = route.params;
     const [gear, setGear] = useState(new Gear())
+    const constant = true
+    const [trigger, setTrigger] = useState(0)
     const [ready, setReady] = useState(false)
     const [settings, setSettings] = useState()
 
+    useEffect(()=>{
+        EventEmitter.subscribe('refreshGearView', (r)=>setTrigger(r))
+        return ()=>{EventEmitter.unsubscribe('refreshGearView')}
+    }, [constant])
 
-    useEffect(() => {
-        wait(800).then(()=>
-            get("settings").then((rv)=>{
+    useEffect(()=>{
+        let isMounted = true
+        get("settings").then((rv)=>{
+            if (isMounted) {
                 setSettings(rv)
                 get(gear_id).then((rv) => {
-                    setGear(rv)
-                    setReady(true)
+                    if (isMounted) {
+                        setGear(rv)
+                        setReady(true)
+                    }
                 })
-            })
-        )
-    },[ready])
+            }
+        })
+        return () => {isMounted = false}
+    },[trigger])
+
 
     return (
         <View style= {styles.container}>

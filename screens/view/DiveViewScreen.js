@@ -4,7 +4,7 @@ import {get, wait} from "../../Data/DAO";
 import {Dive} from "../../models/DiveModel";
 import {Gear} from "../../models/GearModel";
 import {Site} from "../../models/SiteModel";
-import {ImageBackground} from "react-native-web";
+import {EventEmitter} from "../../Data/EventEmitter"
 
 
 
@@ -14,24 +14,37 @@ export default function DiveViewScreen({route, navigation}) {
     const [site, setSite] = useState(new Site())
     const [gear, setGear] = useState(new Gear())
     const [dt, setDT] = useState(new Date())
+    const constant = true
+    const [trigger, setTrigger] = useState(0)
     const [ready, setReady] = useState(false)
     const [settings, setSettings] = useState()
 
-
-    useEffect(() => {
+    useEffect(()=>{
+        EventEmitter.subscribe('refreshDiveView', (r)=>setTrigger(r))
         wait(800).then(()=>
             get("settings").then((rv)=>{
                 setSettings(rv)
                 get(dive_id).then((rv) => {
                     setDive(rv)
                     setDT(new Date(rv.dateTime))
-                    get(rv.siteID).then(setSite).catch(e => console.log(e))
-                    get(rv.gearID).then(setGear).catch(e => console.log(e))
+                    get(rv.siteID).then(setSite)
+                    get(rv.gearID).then(setGear)
                     setReady(true)
                 })
             })
         )
-    },[ready])
+        return ()=>{EventEmitter.unsubscribe('refreshDiveView')}
+    }, [constant])
+
+    useEffect(()=>{
+        let isMounted = true
+        get("settings").then((rv)=>{
+            if (isMounted) {
+                setSettings(rv)
+            }
+        })
+        return () => {isMounted = false}
+    },[trigger])
 
 
     return (

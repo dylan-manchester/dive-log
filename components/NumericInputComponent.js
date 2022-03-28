@@ -8,12 +8,10 @@ export default function NumericInputComponent({title, value, intervals, setterCa
     const width = Dimensions.get('window').width;
 
     useEffect(()=>{
-        if (value) {
-            setText(value.toString())
-        }
+        if (value) {setText(value.toString())}
     }, [value])
 
-    // Called when an option is selected
+
     const onChange = (value) => {
         setText(value);
         setterCallback(value);

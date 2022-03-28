@@ -1,9 +1,10 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import CardComponent from "../../components/CardComponent";
 import {StyleSheet, View, FlatList, Image} from "react-native";
 import {deleteObject, getAll, get, set} from "../../Data/DAO";
 import {useFocusEffect} from "@react-navigation/native";
 import Clipboard from '@react-native-clipboard/clipboard';
+import {EventEmitter} from "../../Data/EventEmitter"
 
 
 export default function DiveSelectScreen({route, navigation}) {
@@ -14,8 +15,14 @@ export default function DiveSelectScreen({route, navigation}) {
     }
     const [settings, setSettings] = useState()
     const [dives, setDives] = useState([]);
+    const constant = true;
     const [ready, setReady] = useState(false);
     const [trigger, setTrigger] = useState(false);
+
+    useEffect(()=>{
+        EventEmitter.subscribe('refreshDiveSelect', (r)=>setTrigger(r))
+        return ()=>{EventEmitter.unsubscribe('refreshDiveSelect')}
+    }, [constant])
 
     useFocusEffect(
         React.useCallback(() => {
@@ -33,7 +40,7 @@ export default function DiveSelectScreen({route, navigation}) {
         deleteObject("dives", id).then((success)=>{
             if (success) {
                 setDives([])
-                setTrigger(!trigger)
+                setTrigger(trigger+1)
             } else {
                 alert(`This should not appear!`)
             }

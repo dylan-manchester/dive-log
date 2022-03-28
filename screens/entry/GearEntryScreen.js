@@ -4,11 +4,12 @@ import DataInputComponent from "../../components/DataInputComponent";
 import {get, newObject, set} from "../../Data/DAO";
 import {Gear} from "../../models/GearModel";
 import {useFocusEffect, useIsFocused} from "@react-navigation/native";
+import {EventEmitter} from "../../Data/EventEmitter"
 
 export default function GearEntryScreen({route, navigation}) {
     const {destination} = route.params;
-    const focus = useIsFocused();
-    const [trigger, setTrigger] = useState(true);
+    const constant = true;
+    const [trigger, setTrigger] = useState(0);
     const [ready, setReady] = useState(false);
     const [settings, setSettings] = useState();
     const [name, setName] = useState('');
@@ -40,14 +41,20 @@ export default function GearEntryScreen({route, navigation}) {
         }
     }, [route.params?.gear_id]);
 
-    useFocusEffect(
-        React.useCallback(()=>{
-            get("settings").then((rv)=>{
+    useEffect(()=>{
+        EventEmitter.subscribe('refreshGearEntry', (r)=>setTrigger(r))
+        return ()=>{EventEmitter.unsubscribe('refreshGearEntry')}
+    }, [constant])
+
+    useEffect(()=>{
+        let isMounted = true
+        get("settings").then((rv)=>{
+            if (isMounted) {
                 setSettings(rv)
                 setReady(true)
-            }).catch(e=>console.log(e))
-        },[focus])
-    )
+            }
+            return () => {isMounted = false}
+        })},[trigger])
 
     const opts2 = ready ? [
         {toggle: true, title: "Name", value: name, callback: setName},

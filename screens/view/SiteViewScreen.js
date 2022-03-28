@@ -2,25 +2,36 @@ import {StyleSheet, Text, View, Image} from "react-native";
 import {get, wait} from "../../Data/DAO";
 import React, {useEffect, useState} from "react";
 import {Site} from "../../models/SiteModel";
+import {EventEmitter} from "../../Data/EventEmitter"
 
 export default function SiteViewScreen({route}) {
     const {site_id} = route.params
     const [site, setSite] = useState(new Site())
+    const constant = true
     const [ready, setReady] = useState(false)
+    const [trigger, setTrigger] = useState(0)
     const [settings, setSettings] = useState()
 
+    useEffect(()=>{
+        EventEmitter.subscribe('refreshSiteView', (r)=>setTrigger(r))
+        return ()=>{EventEmitter.unsubscribe('refreshSiteView')}
+    }, [constant])
 
-    useEffect(() => {
-        wait(800).then(()=>
-            get("settings").then((rv)=>{
+    useEffect(()=>{
+        let isMounted = true
+        get("settings").then((rv)=>{
+            if (isMounted) {
                 setSettings(rv)
                 get(site_id).then((rv) => {
-                    setSite(rv)
-                    setReady(true)
+                    if (isMounted) {
+                        setSite(rv)
+                        setReady(true)
+                    }
                 })
-            })
-        )
-    },[ready])
+            }
+        })
+        return () => {isMounted = false}
+        },[trigger])
 
     return (
         <View style={styles.container}>

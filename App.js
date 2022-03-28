@@ -12,46 +12,40 @@ import GearEntryScreen from "./screens/entry/GearEntryScreen";
 import SiteEntryScreen from "./screens/entry/SiteEntryScreen";
 import {get, set} from "./Data/DAO";
 import HomeScreen from "./screens/HomeScreen";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {MenuProvider} from "react-native-popup-menu";
 import {Pressable, Image, Modal, Text, StyleSheet} from "react-native";
 import SettingsComponent from "./components/SettingsComponent";
+import {Settings} from "./models/SettingsModel"
+import {EventEmitter} from "./Data/EventEmitter"
 
 export default function App() {
+    const [refreshes,setRefreshes] = useState(1)
     const constant = null
     const Stack = createNativeStackNavigator();
     useEffect(()=> {
-        //AsyncStorage.clear().then(()=>console.log("Cleared"))
         get("dives").then((rv) => console.log("Number of dives: " + rv.length)).catch(() => set("dives", []))
         get("sites").then((rv) => console.log("Number of sites: " + rv.length)).catch(() => set("sites", []))
         get("gear").then((rv) => console.log("Number of gears: " + rv.length)).catch(() => set("gear", []))
-        get("settings").then((rv) => console.log("Num of settings: " + Object.keys(rv).length)).catch(() => set("settings", {
-            "Note 1 Name": "Notes 1",
-            "Note 2 Name": "Notes 2",
-            "Note 3 Name": "Notes 3",
-            "Note 4 Name": "Notes 4",
-            "Note 5 Name": "Notes 5",
-            "Show Depth": true,
-            "Show Duration": true,
-            "Show Weight": true,
-            "Show Exposure": true,
-            "Show PSI": true,
-            "Show Notes 1": true,
-            "Show Notes 2": true,
-            "Show Notes 3": true,
-            "Show Notes 4": true,
-            "Show Notes 5": true,
-            "Show Water Type": true,
-            "Show Location": true,
-            "Show Default Depth": true,
-            "Show Cylinder Type": true,
-            "Show Cylinder Size": true,
-            "Show Default Weight": true,
-            "Show Default PSI": true,
-        }))
+        get("settings").then((rv) => console.log("Num of settings: " + Object.keys(rv).length)).catch(() => set("settings", Settings.initialSettings))
     }, [constant])
 
     const [modalVisible, setModalVisible] = useState(false)
+
+    function triggerSettingsRefresh() {
+        setRefreshes((prev)=>prev+1)
+        console.log("Refreshes: "+refreshes)
+        EventEmitter.dispatch('refreshSiteEntry', refreshes)
+        EventEmitter.dispatch('refreshDiveEntry', refreshes)
+        EventEmitter.dispatch('refreshGearEntry', refreshes)
+        EventEmitter.dispatch('refreshDiveSelect', refreshes)
+        EventEmitter.dispatch('refreshSiteSelect', refreshes)
+        EventEmitter.dispatch('refreshGearSelect', refreshes)
+        EventEmitter.dispatch('refreshGearView', refreshes)
+        EventEmitter.dispatch('refreshSiteView', refreshes)
+        EventEmitter.dispatch('refreshDiveView', refreshes)
+        EventEmitter.dispatch('refreshSettings', refreshes)
+    }
+
     return (
         <MenuProvider>
             <NavigationContainer>
@@ -123,8 +117,11 @@ export default function App() {
                 transparent={true}
                 visible={modalVisible}
                 onRequestClose={() => {
+                    triggerSettingsRefresh()
                     setModalVisible(false)}}>
-                <SettingsComponent close={()=>setModalVisible(false)}/>
+                <SettingsComponent close={()=> {
+                    triggerSettingsRefresh()
+                    setModalVisible(false)}}/>
             </Modal>
         </MenuProvider>
     );

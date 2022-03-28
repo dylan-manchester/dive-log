@@ -3,13 +3,16 @@ import {useEffect, useState} from "react";
 import {Switch} from 'react-native-paper';
 
 export default function SwitchInputComponent({title, value, setterCallback}) {
+    const [switchOn, setSwitchOn] = useState(value)
+
     return (
         <View style={styles.container}>
             <View style={styles.description}>
                 <Text style={styles.text}>{title}</Text>
             </View>
             <View style={styles.content}>
-                <Switch value={value} onValueChange={(rv)=>{
+                <Switch value={switchOn} onValueChange={(rv)=>{
+                    setSwitchOn(rv)
                     setterCallback(rv)
                 }}/>
             </View>

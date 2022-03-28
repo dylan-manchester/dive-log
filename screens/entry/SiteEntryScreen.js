@@ -5,11 +5,12 @@ import {get, newObject, set} from "../../Data/DAO";
 import {Site} from "../../models/SiteModel";
 import * as Location from 'expo-location';
 import {useFocusEffect, useIsFocused} from "@react-navigation/native";
+import {EventEmitter} from "../../Data/EventEmitter"
 
 export default function SiteEntryScreen({route, navigation}) {
     const {destination} = route.params;
-    const focus = useIsFocused();
-    const [trigger, setTrigger] = useState(true);
+    const constant = true;
+    const [trigger, setTrigger] = useState(0);
     const [ready, setReady] = useState(false);
     const [settings, setSettings] = useState();
     const [id, setID] = useState();
@@ -41,14 +42,20 @@ export default function SiteEntryScreen({route, navigation}) {
         }
     }, [route.params?.site_id]);
 
-    useFocusEffect(
-        React.useCallback(()=>{
-            get("settings").then((rv)=>{
+    useEffect(()=>{
+        EventEmitter.subscribe('refreshSiteEntry', (r)=>setTrigger(r))
+        return ()=>{EventEmitter.unsubscribe('refreshSiteEntry')}
+    }, [constant])
+
+    useEffect(()=>{
+        let isMounted = true
+        get("settings").then((rv)=>{
+            if (isMounted) {
                 setSettings(rv)
                 setReady(true)
-            }).catch(e=>console.log(e))
-        },[focus])
-    )
+            }
+            return () => {isMounted = false}
+        })},[trigger])
 
     const opts2 = ready ? [
         {toggle: true, title: "Name", value: name, callback: setName},

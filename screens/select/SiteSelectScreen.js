@@ -3,34 +3,47 @@ import CardComponent from "../../components/CardComponent";
 import {StyleSheet, View, FlatList, Image} from "react-native";
 import {getAll, get, set, deleteObject} from "../../Data/DAO";
 import {useFocusEffect} from "@react-navigation/native";
+import {EventEmitter} from "../../Data/EventEmitter"
 
 export default function SiteSelectScreen({route, navigation}) {
     const {destination} = route.params
     const selectAction = (id) => navigation.navigate(destination, {site_id: id})
     const [sites, setSites] = useState([]);
     const [settings, setSettings] = useState()
+    const constant = true;
     const [ready, setReady] = useState(false);
     const [trigger, setTrigger] = useState(false);
     const [favorite, setFavorite] = useState(null);
 
     useFocusEffect(
-        React.useCallback(
-        () => {
-            get("settings").then((rv)=>{
-                setSettings(rv)
-                get("favSite").then(rv=>setFavorite(rv)).catch(e=>console.log(e))
-                getAll("sites", (rv) => {
-                    setSites(rv)
-                    setReady(true)
-                })
+        React.useCallback(() => {
+            get("favSite").then(rv=>setFavorite(rv)).catch(e=>console.log(e))
+            getAll("sites", (rv) => {
+                setSites(rv)
+                setReady(true)
             })
         },[trigger]))
+
+    useEffect(()=>{
+        EventEmitter.subscribe('refreshSiteSelect', (r)=>setTrigger(r))
+        return ()=>{EventEmitter.unsubscribe('refreshSiteSelect')}
+    }, [constant])
+
+    useEffect(()=>{
+        let isMounted = true
+        get("settings").then((rv)=>{
+            if (isMounted) {
+                setSettings(rv)
+                setReady(true)
+            }
+            return () => {isMounted = false}
+        })},[trigger])
 
     const deleteItem = (id) => {
         deleteObject("sites", id).then((success)=>{
             if (success) {
                 setSites([])
-                setTrigger(!trigger)
+                setTrigger(trigger+1)
             } else {
                 alert(`Please remove dependent dives first`)
             }
