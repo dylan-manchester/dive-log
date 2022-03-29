@@ -2,6 +2,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import uuid from 'react-native-uuid';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from "expo-sharing";
+import * as DocumentPicker from 'expo-document-picker';
+import {Site} from "../models/SiteModel"
+import {Gear} from "../models/GearModel"
+
 
 export async function getAll(topLevelKey) {
     console.log("Getting all "+topLevelKey)
@@ -116,13 +120,33 @@ export const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
+async function alreadyExists(topLevelKey, newObj) {
+    const oldObjects = await getAll(topLevelKey)
+    const equivalentObjects = oldObjects.filter((value)=>topLevelKey==="sites" ? Site.eq(value,newObj): Gear.eq(value,newObj))
+    console.log("Equivilent Objects:\n")
+    console.log(equivalentObjects)
+    if (equivalentObjects.length !== 0) {
+        return equivalentObjects[0].id
+    }
+    return null
+}
 
 
-
-
-
-
-
+const unflattenJSON = (obj = {}, res = {}, extraKey = '') => {
+    for(const key in obj){
+        if(key.includes("__")){
+            let parts = key.split("__")
+            if (res[parts[0]]) {
+                res[parts[0]][parts[1]] = obj[key];
+            } else {
+                res[parts[0]] = {[parts[1]]: obj[key]}
+            }
+        }else{
+            res[key] = obj[key];
+        };
+    };
+    return res;
+};
 
 const flattenJSON = (obj = {}, res = {}, extraKey = '') => {
     for(const key in obj){
@@ -144,6 +168,22 @@ const JSONtoCSV = (obj = {}) => {
     ].join('\r\n')
     return csv
 }
+
+const CSVtoJSON = (csv = '') => {
+    let lines=csv.split("\n");
+    let result = [];
+    let headers=lines[0].split(",");
+    for(let i=1;i<lines.length;i++){
+        let obj = {};
+        let currentline=lines[i].split(",");
+        for(let j=0;j<headers.length;j++){
+            obj[headers[j]] = currentline[j];
+        }
+        result.push(obj);
+    }
+    return result;
+}
+
 export async function exportAllDives() {
     const dives = await getAll("dives");
     let flatDives = await Promise.all(dives.map(async (dive)=>{
@@ -166,3 +206,56 @@ export async function exportAllDives() {
     await Sharing.shareAsync(fileURI)
     return csv;
 }
+
+export async function importDives() {
+    let file = await selectOneFile()
+    if (file.type!=='cancel') {
+        let string = await FileSystem.readAsStringAsync(file.uri)
+        const flatDives = CSVtoJSON(string)
+        for (let i in flatDives) {
+            let dive = unflattenJSON(flatDives[i], {}, '')
+            let site_id = await alreadyExists("sites", dive.site)
+            if (site_id === null) {
+                site_id = await newObject("sites", dive.site)
+            }
+            dive.siteName = dive.site.name
+            dive.siteID = site_id
+            delete dive.site
+
+            let gear_id = await alreadyExists("gear", dive.gear)
+            if (gear_id === null) {
+                gear_id = await newObject("gear", dive.gear)
+            }
+            dive.gearName = dive.gear.name
+            dive.gearID = gear_id
+            delete dive.gear
+            await newObject("dives", dive)
+        }
+    } else {
+        console.log("File Selection Canceled\n")
+    }
+}
+
+
+const selectOneFile = async () => {
+
+    try {
+        console.log('Importing:')
+        const res = await DocumentPicker.getDocumentAsync()
+        console.log('URI : ' + res.uri);
+        console.log('Type : ' + res.type);
+        console.log('File Name : ' + res.name);
+        console.log('')
+        return res;
+    } catch (err) {
+        //Handling any exception (If any)
+        if (DocumentPicker.isCancel(err)) {
+            //If user canceled the document selection
+            alert('Canceled from single doc picker');
+        } else {
+            //For Unknown Error
+            alert('Unknown Error: ' + JSON.stringify(err));
+            throw err;
+        }
+    }
+};

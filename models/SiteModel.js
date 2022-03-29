@@ -12,4 +12,12 @@ export class Site {
         this.waterType = waterType;
         this.defaultDepth = defaultDepth;
     }
+
+    static eq(me: Site, other : Site) {
+        return me.name === other.name &&
+        me.latitude === other.latitude &&
+        me.longitude === other.longitude &&
+        me.waterType === other.waterType &&
+        me.defaultDepth === other.defaultDepth
+    }
 }
