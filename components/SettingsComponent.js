@@ -1,6 +1,5 @@
-import {Image, Pressable, StyleSheet, Text, View, ScrollView} from "react-native";
+import {Pressable, StyleSheet, Text, View, ScrollView} from "react-native";
 import {useEffect, useState} from "react";
-import {Menu, MenuOption, MenuOptions, MenuTrigger} from "react-native-popup-menu";
 import {set, get, exportAllDives, importDives} from "../Data/DAO"
 import SettingInputComponent from "./SettingInputComponent"
 import {Settings} from "../models/SettingsModel"
@@ -33,7 +32,7 @@ export default function SettingsComponent({close}) {
         set("settings", settings).then(()=>console.log("Set")).catch(e=>console.log(e))
     }
 
-    const importCSV = importDives
+    const importCSV = ()=>importDives().then(()=>alert("Import finished"))
     const exportCSV = exportAllDives
 
 

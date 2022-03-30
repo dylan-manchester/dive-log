@@ -63,7 +63,7 @@ export default function SiteSelectScreen({route, navigation}) {
     const renderItem = ({item}) =>
         <CardComponent
             title={item.name}
-            subtitle1={settings["Show Location"] ? "("+item.latitude+", "+item.longitude+")" : ""}
+            subtitle1={settings["Show Location"] ? "("+ ((!isNaN(parseFloat(item.latitude))) ? parseFloat(item.latitude).toFixed(3) : item.latitude)+", "+((!isNaN(parseFloat(item.longitude))) ? parseFloat(item.longitude).toFixed(3) : item.longitude)+")" : ""}
             subtitle2={settings["Show Water Type"] ? item.waterType : ""}
             subtitle3={settings["Show Default Depth"] ? item.defaultDepth+" ft" : ""}
             favorite={item.id === favorite}

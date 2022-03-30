@@ -1,5 +1,4 @@
-import {StyleSheet, Text, TextInput, View, Pressable} from 'react-native'
-import {useEffect, useState} from "react";
+import {StyleSheet, View} from 'react-native'
 import NumericInputComponent from "./NumericInputComponent";
 import OptionsInputComponent from "./OptionsInputComponent";
 import StringInputComponent from "./StringInputComponent";
@@ -22,11 +21,13 @@ export default function ({props}) {
                         options={props.options}
                         value={props.value}
                         setterCallback={props.callback}/>
-                    : props.location != null ?
+                    : props.latitude != null ?
                         <LocationInputComponent
                             title={props.title}
-                            location={props.location}
-                            setterCallbacks={props.callbacks}/>
+                            latitude={props.latitude}
+                            longitude={props.longitude}
+                            latitudeCallback={props.latitudeCallback}
+                            longitudeCallback={props.longitudeCallback}/>
                         : <StringInputComponent
                             title={props.title}
                             value={props.value}

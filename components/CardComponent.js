@@ -101,6 +101,7 @@ const styles = StyleSheet.create({
         zIndex: 100,
         borderWidth: 1,
         borderBottomColor: 'black',
+        borderRadius: 10,
     },
     pressed: {
         backgroundColor: '#0b3142',

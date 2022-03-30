@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {Platform, Pressable, StyleSheet, Text, TextInput, View, ScrollView} from 'react-native';
+import {Platform, Pressable, StyleSheet, Text, ScrollView} from 'react-native';
 import DataInputComponent from "../../components/DataInputComponent";
 import {get, set, newObject} from "../../Data/DAO";
 import {Dive} from "../../models/DiveModel";
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {useFocusEffect, useIsFocused} from "@react-navigation/native";
 import {EventEmitter} from "../../Data/EventEmitter"
+import {Gear} from "../../models/GearModel"
+import {Site} from "../../models/SiteModel"
 
 export default function DiveEntryScreen({route, navigation}) {
     const {destination} = route.params
@@ -83,7 +84,7 @@ export default function DiveEntryScreen({route, navigation}) {
         get("favSite").then((rv)=>{
             if (rv != null) {
                 get(rv).then(
-                    site=>{
+                    (site : Site)=>{
                         if (site != null) {
                             setSiteID(rv)
                             setSiteName(site.name)
@@ -125,8 +126,8 @@ export default function DiveEntryScreen({route, navigation}) {
 
 
     useEffect(() => {
+        let isMounted = true
         if (route.params?.site_id) {
-            let isMounted = true
             get(route.params.site_id).then(
                 site=>{
                     if (isMounted) {
@@ -140,10 +141,10 @@ export default function DiveEntryScreen({route, navigation}) {
     }, [route.params?.site_id]);
 
     useEffect(() => {
+        let isMounted = true
         if (route.params?.gear_id) {
-            let isMounted = true
             get(route.params.gear_id).then(
-                gear=>{
+                (gear : Gear)=>{
                     if (isMounted) {
                         setGearName(gear.name)
                         setStartingPSI(gear.defaultStartingPSI)
@@ -182,9 +183,9 @@ export default function DiveEntryScreen({route, navigation}) {
     };
 
     const submit = () => {
-        const value = new Dive(dateTime, siteID, siteName, gearID, gearName, depth, duration, weight, exposure, startingPSI, endingPSI, notes1, notes2, notes3, notes4, notes5)
+        const value = new Dive().initFromValues(dateTime, siteID, siteName, gearID, gearName, depth, duration, weight, exposure, startingPSI, endingPSI, notes1, notes2, notes3, notes4, notes5)
         if (id == null) {
-            newObject("dives", value).then((key) => navigation.navigate("selectDive", {destination: destination}))
+            newObject("dives", value).then(() => navigation.navigate("selectDive", {destination: destination}))
         } else {
             value.id = id
             set(id, value).then(() => navigation.navigate("selectDive", {destination: destination}))

@@ -13,7 +13,7 @@ import SiteEntryScreen from "./screens/entry/SiteEntryScreen";
 import {get, set} from "./Data/DAO";
 import HomeScreen from "./screens/HomeScreen";
 import {MenuProvider} from "react-native-popup-menu";
-import {Pressable, Image, Modal, Text, StyleSheet} from "react-native";
+import {Pressable, Image, Modal, StyleSheet} from "react-native";
 import SettingsComponent from "./components/SettingsComponent";
 import {Settings} from "./models/SettingsModel"
 import {EventEmitter} from "./Data/EventEmitter"

@@ -5,6 +5,7 @@ import * as Sharing from "expo-sharing";
 import * as DocumentPicker from 'expo-document-picker';
 import {Site} from "../models/SiteModel"
 import {Gear} from "../models/GearModel"
+import {Dive} from "../models/DiveModel"
 
 
 export async function getAll(topLevelKey) {
@@ -143,8 +144,8 @@ const unflattenJSON = (obj = {}, res = {}, extraKey = '') => {
             }
         }else{
             res[key] = obj[key];
-        };
-    };
+        }
+    }
     return res;
 };
 
@@ -154,8 +155,8 @@ const flattenJSON = (obj = {}, res = {}, extraKey = '') => {
             res[extraKey + key] = obj[key];
         }else{
             flattenJSON(obj[key], res, `${extraKey}${key}__`);
-        };
-    };
+        }
+    }
     return res;
 };
 
@@ -186,19 +187,7 @@ const CSVtoJSON = (csv = '') => {
 
 export async function exportAllDives() {
     const dives = await getAll("dives");
-    let flatDives = await Promise.all(dives.map(async (dive)=>{
-        delete dive.id
-        let site = await get(dive.siteID)
-        dive.site = site
-        delete dive.site.id
-        delete dive.siteID
-        let gear = await get(dive.gearID)
-        dive.gear = gear
-        delete dive.gear.id
-        delete dive.gearID
-        let flatDive = flattenJSON(dive, {}, '')
-        return flatDive
-        }))
+    let flatDives = await Promise.all(dives.map(exportableDive))
     let csv = JSONtoCSV(flatDives);
     console.log("CSV:\n"+csv);
     let fileURI = FileSystem.documentDirectory+"export.csv"
@@ -209,31 +198,16 @@ export async function exportAllDives() {
 
 export async function importDives() {
     let file = await selectOneFile()
-    if (file.type!=='cancel') {
+    if (file.type !== 'cancel') {
         let string = await FileSystem.readAsStringAsync(file.uri)
         const flatDives = CSVtoJSON(string)
         for (let i in flatDives) {
-            let dive = unflattenJSON(flatDives[i], {}, '')
-            let site_id = await alreadyExists("sites", dive.site)
-            if (site_id === null) {
-                site_id = await newObject("sites", dive.site)
-            }
-            dive.siteName = dive.site.name
-            dive.siteID = site_id
-            delete dive.site
-
-            let gear_id = await alreadyExists("gear", dive.gear)
-            if (gear_id === null) {
-                gear_id = await newObject("gear", dive.gear)
-            }
-            dive.gearName = dive.gear.name
-            dive.gearID = gear_id
-            delete dive.gear
-            await newObject("dives", dive)
+            await importDive(flatDives[i])
         }
-    } else {
-        console.log("File Selection Canceled\n")
-    }
+    } else
+        {
+            console.log("File Selection Canceled\n")
+        }
 }
 
 
@@ -248,14 +222,45 @@ const selectOneFile = async () => {
         console.log('')
         return res;
     } catch (err) {
-        //Handling any exception (If any)
         if (DocumentPicker.isCancel(err)) {
-            //If user canceled the document selection
             alert('Canceled from single doc picker');
         } else {
-            //For Unknown Error
             alert('Unknown Error: ' + JSON.stringify(err));
             throw err;
         }
     }
 };
+
+export const exportableDive = async (dive) => {
+    delete dive.id
+    let site = await get(dive.siteID)
+    dive.site = site
+    delete dive.site.id
+    delete dive.siteID
+    let gear = await get(dive.gearID)
+    dive.gear = gear
+    delete dive.gear.id
+    delete dive.gearID
+    let flatDive = flattenJSON(dive, {}, '')
+    return flatDive
+}
+
+export const importDive = async (flatDive) => {
+    let dive = unflattenJSON(flatDive, {}, '')
+    const site = new Site().initFromObject(dive.site)
+    let site_id = await alreadyExists("sites", site)
+    if (site_id === null) site_id = await newObject("sites", site)
+    dive.siteName = site.name
+    dive.siteID = site_id
+    delete dive.site
+
+    const gear = new Gear().initFromObject(dive.gear)
+    let gear_id = await alreadyExists("gear", gear)
+    if (gear_id === null) gear_id = await newObject("gear", gear)
+    dive.gearName = gear.name
+    dive.gearID = gear_id
+    delete dive.gear
+
+    const diveObject = new Dive().initFromObject(dive)
+    let newKey = await newObject("dives", diveObject)
+}

@@ -3,7 +3,6 @@ import {Pressable, StyleSheet, Text, ScrollView} from 'react-native';
 import DataInputComponent from "../../components/DataInputComponent";
 import {get, newObject, set} from "../../Data/DAO";
 import {Gear} from "../../models/GearModel";
-import {useFocusEffect, useIsFocused} from "@react-navigation/native";
 import {EventEmitter} from "../../Data/EventEmitter"
 
 export default function GearEntryScreen({route, navigation}) {
@@ -65,7 +64,7 @@ export default function GearEntryScreen({route, navigation}) {
     ] : []
 
     const submit = () => {
-        const value = new Gear(name, cylinderType, cylinderSize, defaultWeight, defaultStaringPSI)
+        const value = new Gear().initFromValues(name, cylinderType, cylinderSize, defaultWeight, defaultStaringPSI)
         if (id == null) {
             newObject("gear",value).then((key)=>navigation.navigate("selectGear", {destination: destination}))
         } else {

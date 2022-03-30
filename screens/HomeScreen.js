@@ -6,21 +6,21 @@ export default function HomeScreen({navigation}) {
     return (
         <View style={styles.container}>
             <View style={styles.row}>
-                <Pressable style={styles.dive} onPress={()=>navigation.navigate("selectDive", {destination: "viewDive"})}>
+                <Pressable style={({pressed})=>[pressed ? styles.pressed : styles.unpressed, styles.pressable]} onPress={()=>navigation.navigate("selectDive", {destination: "viewDive"})}>
                     <ImageBackground style={styles.image} source={require("../assets/dive.jpg")}>
                         <Text style={styles.text}>Dives</Text>
                     </ImageBackground>
                 </Pressable>
             </View>
             <View style={styles.row}>
-                <Pressable style={styles.site} onPress={()=>navigation.navigate("selectSite", {destination: "viewSite"})}>
+                <Pressable style={({pressed})=>[pressed ? styles.pressed : styles.unpressed, styles.pressable]} onPress={()=>navigation.navigate("selectSite", {destination: "viewSite"})}>
                     <ImageBackground style={styles.image} source={require("../assets/site.jpg")}>
                         <Text style={styles.text}>Sites</Text>
                     </ImageBackground>
                 </Pressable>
             </View>
             <View style={styles.row}>
-                <Pressable style={styles.gear} onPress={()=>navigation.navigate("selectGear", {destination: "viewGear"})}>
+                <Pressable style={({pressed})=>[pressed ? styles.pressed : styles.unpressed, styles.pressable]} onPress={()=>navigation.navigate("selectGear", {destination: "viewGear"})}>
                     <ImageBackground style={styles.image} source={require("../assets/gear.jpg")} alt={"Gear"}>
                         <Text style={styles.text}>Gear</Text>
                     </ImageBackground>
@@ -43,32 +43,25 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         flex: .3,
     },
-    dive: {
+    pressable: {
+        zIndex: 100,
         flex: .5,
         justifyContent: 'center',
         alignItems: 'center',
         borderColor: 'black',
         borderWidth: 3,
     },
-    site: {
-        flex: .5,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderColor: 'black',
-        borderWidth: 3,
+    unpressed: {
     },
-    gear: {
-        flex: .5,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderColor: 'black',
-        borderWidth: 3,
+    pressed: {
+        opacity: .75,
     },
     image: {
         height: "100%",
         width: "100%",
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        zIndex: -1,
     },
     text: {
         color: "white",

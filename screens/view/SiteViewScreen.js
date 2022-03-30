@@ -1,5 +1,5 @@
 import {StyleSheet, Text, View, Image} from "react-native";
-import {get, wait} from "../../Data/DAO";
+import {get} from "../../Data/DAO";
 import React, {useEffect, useState} from "react";
 import {Site} from "../../models/SiteModel";
 import {EventEmitter} from "../../Data/EventEmitter"
@@ -38,7 +38,7 @@ export default function SiteViewScreen({route}) {
             {ready ?
                 <View style={styles.content}>
                     <Text style={styles.title}>{site.name}</Text>
-                    {settings["Show Location"] ? <Text style={styles.subtitle}>Location: ({site.latitude}, {site.longitude})</Text> : null }
+                    {settings["Show Location"] ? <Text style={styles.subtitle}>Location: ({site.latitude},{site.longitude})</Text> : null }
                     {settings["Show Water Type"] ? <Text style={styles.subtitle}>Water Type: {site.waterType}</Text> : null }
                     {settings["Show Default Depth"] ?<Text style={styles.subtitle}>Default Depth: {site.defaultDepth} ft</Text> : null }
                 </View>
@@ -56,6 +56,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#02adec',
     },
     content: {
+        borderRadius: 10,
         width: "90%",
         justifyContent: "space-between",
         backgroundColor: '#aecdcb',

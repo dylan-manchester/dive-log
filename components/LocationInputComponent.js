@@ -3,30 +3,16 @@ import {useEffect, useState} from "react";
 import * as Location from "expo-location";
 
 
-export default function LocationInputComponent({title, location, setterCallbacks}) {
-    const [latitude, setLatitude] = useState('')
-    const [longitude, setLongitude] = useState('')
+export default function LocationInputComponent({title, latitude, longitude, latitudeCallback, longitudeCallback}) {
 
-    useEffect(()=>{
-        if (location) {
-            if (location.latitude) {
-                setLatitude(location.latitude.toString())
-            }
-            if (location.longitude) {
-                setLongitude(location.longitude.toString())
-            }
-        }
-    }, [location])
 
 
     const onChangeLatitude =  (value) => {
-        setLatitude(value.toString())
-        setterCallbacks[0](value.toString())
+        latitudeCallback(value.toString())
     }
 
     const onChangeLongitude = (value) => {
-        setLongitude(value.toString())
-        setterCallbacks[1](value.toString())
+        longitudeCallback(value.toString())
     }
 
     const getLocation = () => {
@@ -57,14 +43,14 @@ export default function LocationInputComponent({title, location, setterCallbacks
                     <TextInput
                         style={styles.textInput}
                         placeholder={"Enter latitude"}
-                        value={latitude}
+                        value={latitude.toString()}
                         onChangeText={onChangeLatitude}/>
                 </View>
                 <View>
                     <TextInput
                         style={styles.textInput}
                         placeholder={"Enter longitude"}
-                        value={longitude}
+                        value={longitude.toString()}
                         onChangeText={onChangeLongitude}/>
                 </View>
             </View>

@@ -7,12 +7,10 @@ export const EventEmitter = {
     },
     subscribe: function (event, callback) {
         if (!this._events[event]) this._events[event] = [];
-        console.log("Subscribed: "+event)
         this._events[event].push(callback);
     },
     unsubscribe: function (event) {
         if (!this._events[event]) return;
-        console.log("Unsubscribed: "+event)
         delete this._events[event];
     }
 }

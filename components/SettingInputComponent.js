@@ -1,9 +1,5 @@
-import {StyleSheet, Text, TextInput, View, Pressable} from 'react-native'
-import {useEffect, useState} from "react";
-import NumericInputComponent from "./NumericInputComponent";
-import OptionsInputComponent from "./OptionsInputComponent";
+import {StyleSheet, View} from 'react-native'
 import StringInputComponent from "./StringInputComponent";
-import LocationInputComponent from "./LocationInputComponent";
 import SwitchInputComponent from "./SwitchInputComponent";
 
 export default function SettingInputComponent({props}) {

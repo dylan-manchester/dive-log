@@ -1,5 +1,4 @@
 import {StyleSheet, Dimensions, Text, TextInput, View, Pressable} from 'react-native'
-import {scale} from "../Data/scaling"
 import {useEffect, useState} from "react";
 
 

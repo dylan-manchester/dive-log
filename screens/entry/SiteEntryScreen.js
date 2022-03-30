@@ -1,10 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Pressable, ScrollView, StyleSheet, Text} from 'react-native';
 import DataInputComponent from "../../components/DataInputComponent";
 import {get, newObject, set} from "../../Data/DAO";
 import {Site} from "../../models/SiteModel";
 import * as Location from 'expo-location';
-import {useFocusEffect, useIsFocused} from "@react-navigation/native";
 import {EventEmitter} from "../../Data/EventEmitter"
 
 export default function SiteEntryScreen({route, navigation}) {
@@ -15,8 +14,8 @@ export default function SiteEntryScreen({route, navigation}) {
     const [settings, setSettings] = useState();
     const [id, setID] = useState();
     const [name, setName] = useState('');
-    const [latitude, setLatitude] = useState('')
-    const [longitude, setLongitude] = useState('')
+    const [latitude, setLatitude] = useState(null)
+    const [longitude, setLongitude] = useState(null)
     const [waterType, setWaterType] = useState('')
     const [defaultDepth, setDefaultDepth] = useState(0)
 
@@ -60,12 +59,14 @@ export default function SiteEntryScreen({route, navigation}) {
     const opts2 = ready ? [
         {toggle: true, title: "Name", value: name, callback: setName},
         {toggle: settings["Show Water Type"], title: "Water Type", options: ["Salt", "Fresh"], value: waterType, callback: setWaterType},
-        {toggle: settings["Show Location"], title: "Location", location: [latitude, longitude], callbacks: [setLatitude, setLongitude]},
+        {toggle: settings["Show Location"], title: "Location", latitude: latitude, longitude: longitude, latitudeCallback: setLatitude, longitudeCallback: setLongitude},
         {toggle: settings["Show Default Depth"], title: "Default Depth", intervals: [1, 10, 25], value: defaultDepth, callback: setDefaultDepth},
     ] : []
 
     const submit = () => {
-        const value = new Site(name, latitude, longitude, waterType, defaultDepth)
+        const value = new Site().initFromValues(name, latitude, longitude, waterType, defaultDepth)
+        console.log("HERE!")
+        console.log(value)
         if (id == null) {
             newObject("sites",value).then((key)=>navigation.navigate("selectSite", {destination: destination}))
         } else {

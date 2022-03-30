@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from "react";
 import CardComponent from "../../components/CardComponent";
 import {StyleSheet, View, FlatList, Image} from "react-native";
-import {deleteObject, getAll, get, set} from "../../Data/DAO";
+import {deleteObject, getAll, get, exportableDive, importDive} from "../../Data/DAO";
 import {useFocusEffect} from "@react-navigation/native";
-import Clipboard from '@react-native-clipboard/clipboard';
+import * as Clipboard from 'expo-clipboard';
 import {EventEmitter} from "../../Data/EventEmitter"
 
 
@@ -17,7 +17,7 @@ export default function DiveSelectScreen({route, navigation}) {
     const [dives, setDives] = useState([]);
     const constant = true;
     const [ready, setReady] = useState(false);
-    const [trigger, setTrigger] = useState(false);
+    const [trigger, setTrigger] = useState(0);
 
     useEffect(()=>{
         EventEmitter.subscribe('refreshDiveSelect', (r)=>setTrigger(r))
@@ -26,6 +26,8 @@ export default function DiveSelectScreen({route, navigation}) {
 
     useFocusEffect(
         React.useCallback(() => {
+            setReady(false)
+            setDives([])
             get("settings").then((rv)=>{
                 setSettings(rv)
                 getAll("dives").then((rv) => {
@@ -50,14 +52,13 @@ export default function DiveSelectScreen({route, navigation}) {
     const editItem = (id) =>
         navigation.navigate("entryDive", {destination: destination, dive_id: id})
 
-    const exportItem = (item) => Clipboard.setString(JSON.stringify(item))
+    const exportItem = async (item) => Clipboard.setString(JSON.stringify(await exportableDive(item)))
 
-    const importItem = () => {
-        Clipboard.getString().then((text)=>
-            set("tempDive",text).then(
-                navigation.navigate("entryDive", {destination: destination, dive_id: "tempDive"})
-            ).catch(e=>console.log(e))
-        ).catch(e=>console.log(e))
+    const importItem = async () => {
+        let text = await Clipboard.getStringAsync()
+        await importDive(JSON.parse(text))
+        setDives([])
+        setTrigger(trigger+1)
     }
 
 
@@ -94,7 +95,7 @@ export default function DiveSelectScreen({route, navigation}) {
                     : <Image source={require("../../assets/loading.gif")}/>}
             </View>
         </View>
-    );
+    )
 
 }
 
