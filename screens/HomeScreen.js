@@ -3,6 +3,7 @@ import {Pressable, StyleSheet, Text, View, ImageBackground} from 'react-native';
 
 
 export default function HomeScreen({navigation}) {
+
     return (
         <View style={styles.container}>
             <View style={styles.row}>

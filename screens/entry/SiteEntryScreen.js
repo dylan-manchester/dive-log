@@ -14,8 +14,8 @@ export default function SiteEntryScreen({route, navigation}) {
     const [settings, setSettings] = useState();
     const [id, setID] = useState();
     const [name, setName] = useState('');
-    const [latitude, setLatitude] = useState(null)
-    const [longitude, setLongitude] = useState(null)
+    const [latitude, setLatitude] = useState('')
+    const [longitude, setLongitude] = useState('')
     const [waterType, setWaterType] = useState('')
     const [defaultDepth, setDefaultDepth] = useState(0)
 

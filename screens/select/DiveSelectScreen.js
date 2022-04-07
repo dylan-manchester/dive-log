@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from "react";
 import CardComponent from "../../components/CardComponent";
-import {StyleSheet, View, FlatList, Image} from "react-native";
-import {deleteObject, getAll, get, exportableDive, importDive} from "../../Data/DAO";
+import {StyleSheet, View, FlatList, Image, Alert} from "react-native";
+import {deleteObject, getAll, get} from "../../Data/DAO";
 import {useFocusEffect} from "@react-navigation/native";
 import * as Clipboard from 'expo-clipboard';
 import {EventEmitter} from "../../Data/EventEmitter"
+import {exportableDive, importDive} from "../../Data/IO";
 
 
 export default function DiveSelectScreen({route, navigation}) {
@@ -26,33 +27,37 @@ export default function DiveSelectScreen({route, navigation}) {
 
     useFocusEffect(
         React.useCallback(() => {
+            let isMounted = true
             setReady(false)
             setDives([])
             get("settings").then((rv)=>{
-                setSettings(rv)
-                getAll("dives").then((rv) => {
-                    setDives(rv)
-                    setReady(true)
-                })
+                if (isMounted) {
+                    setSettings(rv)
+                    getAll("dives").then((rv) => {
+                        if (isMounted) {
+                            setDives(rv)
+                            setReady(true)
+                        }
+                    })
+                }
             })
+            return () => {isMounted = false}
         },[trigger])
     )
 
-    const deleteItem = (id) => {
-        deleteObject("dives", id).then((success)=>{
-            if (success) {
-                setDives([])
-                setTrigger(trigger+1)
-            } else {
-                alert(`This should not appear!`)
-            }
-        })
+    const deleteItem = async (id) => {
+        let success = await deleteObject("dives", id)
+        if (success) {
+            setDives([])
+            setTrigger(trigger+1)
+        } else {
+            Alert.alert(`Error`, 'Please try again')
+        }
     }
 
-    const editItem = (id) =>
-        navigation.navigate("entryDive", {destination: destination, dive_id: id})
+    const editItem = (id) => navigation.navigate("entryDive", {destination: destination, dive_id: id})
 
-    const exportItem = async (item) => Clipboard.setString(JSON.stringify(await exportableDive(item)))
+    const exportItem = async (item) => Clipboard.setString(JSON.stringify(await exportableDive({...item})))
 
     const importItem = async () => {
         let text = await Clipboard.getStringAsync()

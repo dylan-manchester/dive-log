@@ -21,19 +21,28 @@ export default function DiveViewScreen({route, navigation}) {
 
     useEffect(()=>{
         EventEmitter.subscribe('refreshDiveView', (r)=>setTrigger(r))
+        return ()=>{EventEmitter.unsubscribe('refreshDiveView')}
+    }, [constant])
+
+    useEffect( () => {
+        let isMounted = true
         wait(800).then(()=>
             get("settings").then((rv)=>{
-                setSettings(rv)
-                get(dive_id).then((rv) => {
-                    setDive(rv)
-                    setDT(new Date(rv.dateTime))
-                    get(rv.siteID).then(setSite)
-                    get(rv.gearID).then(setGear)
-                    setReady(true)
-                })
+                if (isMounted) {
+                    setSettings(rv)
+                    get(dive_id).then((rv) => {
+                        if (isMounted) {
+                            setDive(rv)
+                            setDT(new Date(rv.dateTime))
+                            get(rv.siteID).then(setSite)
+                            get(rv.gearID).then(setGear)
+                            setReady(true)
+                        }
+                    })
+                }
             })
         )
-        return ()=>{EventEmitter.unsubscribe('refreshDiveView')}
+        return () => {isMounted = false}
     }, [constant])
 
     useEffect(()=>{

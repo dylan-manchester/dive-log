@@ -10,6 +10,7 @@ import SiteViewScreen from "./screens/view/SiteViewScreen";
 import SiteSelectScreen from "./screens/select/SiteSelectScreen";
 import GearEntryScreen from "./screens/entry/GearEntryScreen";
 import SiteEntryScreen from "./screens/entry/SiteEntryScreen";
+import StatsScreen from "./screens/StatsScreen"
 import {get, set} from "./Data/DAO";
 import HomeScreen from "./screens/HomeScreen";
 import {MenuProvider} from "react-native-popup-menu";
@@ -69,7 +70,7 @@ export default function App() {
                         <Stack.Screen
                             name="entryDive"
                             component={DiveEntryScreen}
-                            initialParams={{ destination: "home"}}
+                            initialParams={{ destination: "viewDive"}}
                             options={{title: "Dive Entry"}}/>
                         <Stack.Screen
                             name="selectDive"
@@ -83,7 +84,7 @@ export default function App() {
                         <Stack.Screen
                             name="entryGear"
                             component={GearEntryScreen}
-                            initialParams={{ destination: "home"}}
+                            initialParams={{ destination: "viewGear"}}
                             options={{title: "Gear Entry"}}/>
                         <Stack.Screen
                             name="selectGear"
@@ -97,7 +98,7 @@ export default function App() {
                         <Stack.Screen
                             name="entrySite"
                             component={SiteEntryScreen}
-                            initialParams={{ destination: "home"}}
+                            initialParams={{ destination: "viewSite"}}
                             options={{title: "Site Entry"}}/>
                         <Stack.Screen
                             name="selectSite"
@@ -108,6 +109,11 @@ export default function App() {
                             name="viewSite"
                             component={SiteViewScreen}
                             options={{title: "View Site"}}/>
+                        <Stack.Screen
+                            name="stats"
+                            component={StatsScreen}
+                            options={{title: "Statistics"}}
+                            />
                     </Stack.Group>
                 </Stack.Navigator>
             </NavigationContainer>

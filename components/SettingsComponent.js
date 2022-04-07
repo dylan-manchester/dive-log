@@ -1,10 +1,11 @@
 import {Pressable, StyleSheet, Text, View, ScrollView} from "react-native";
 import {useEffect, useState} from "react";
-import {set, get, exportAllDives, importDives} from "../Data/DAO"
+import {set, get} from "../Data/DAO"
 import SettingInputComponent from "./SettingInputComponent"
 import {Settings} from "../models/SettingsModel"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {EventEmitter} from "../Data/EventEmitter"
+import {exportAllDives, importFile} from "../Data/IO";
 
 export default function SettingsComponent({close}) {
     const constant = true
@@ -32,7 +33,7 @@ export default function SettingsComponent({close}) {
         set("settings", settings).then(()=>console.log("Set")).catch(e=>console.log(e))
     }
 
-    const importCSV = ()=>importDives().then(()=>alert("Import finished"))
+    const importCSV = ()=>importFile().then(()=>console.log("Done"))//()=>alert("Import finished"))
     const exportCSV = exportAllDives
 
 

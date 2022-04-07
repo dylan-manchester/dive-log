@@ -1,5 +1,4 @@
 import {StyleSheet, Text, TextInput, View, Pressable} from 'react-native'
-import {useEffect, useState} from "react";
 import * as Location from "expo-location";
 
 
@@ -18,7 +17,7 @@ export default function LocationInputComponent({title, latitude, longitude, lati
     const getLocation = () => {
         Location.requestForegroundPermissionsAsync().then(({status})=> {
             if (status !== 'granted') {
-                alert("Not permitted")
+                alert("Please grant location permissions to use this feature")
                 return;
             }
             Location.getCurrentPositionAsync({}).then((location)=> {

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Platform, Pressable, StyleSheet, Text, ScrollView} from 'react-native';
+import {Platform, Pressable, StyleSheet, Text, ScrollView, Alert} from 'react-native';
 import DataInputComponent from "../../components/DataInputComponent";
 import {get, set, newObject} from "../../Data/DAO";
 import {Dive} from "../../models/DiveModel";
@@ -183,14 +183,21 @@ export default function DiveEntryScreen({route, navigation}) {
     };
 
     const submit = () => {
-        const value = new Dive().initFromValues(dateTime, siteID, siteName, gearID, gearName, depth, duration, weight, exposure, startingPSI, endingPSI, notes1, notes2, notes3, notes4, notes5)
-        if (id == null) {
-            newObject("dives", value).then(() => navigation.navigate("selectDive", {destination: destination}))
+        if ((siteID === undefined) || (gearID === undefined)) {
+            let alertMessage = ""
+            if (siteID === undefined) alertMessage += "Please Select a Site\n"
+            if (gearID === undefined) alertMessage += "Please Select a Gear Configuration\n"
+            Alert.alert("Halt!", alertMessage)
         } else {
-            value.id = id
-            set(id, value).then(() => navigation.navigate("selectDive", {destination: destination}))
+            const value = new Dive().initFromValues(dateTime, siteID, siteName, gearID, gearName, depth, duration, weight, exposure, startingPSI, endingPSI, notes1, notes2, notes3, notes4, notes5)
+            if (id == null) {
+                newObject("dives", value).then(() => navigation.navigate("selectDive", {destination: destination}))
+            } else {
+                value.id = id
+                set(id, value).then(() => navigation.navigate("selectDive", {destination: destination}))
+            }
+            clearState()
         }
-        clearState()
     }
 
     return (

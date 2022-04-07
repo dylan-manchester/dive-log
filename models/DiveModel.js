@@ -20,9 +20,9 @@ export class Dive {
     constructor() {
         this.dateTime = new Date();
         this.siteID = null;
-        this.siteName = null;
+        this.siteName = "Site Name";
         this.gearID = null;
-        this.gearName = null;
+        this.gearName = "Gear Config";
         this.depth = 0;
         this.duration = 0;
         this.weight = 0;
