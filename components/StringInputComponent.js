@@ -2,7 +2,7 @@ import {StyleSheet, Text, TextInput, View} from 'react-native'
 import {useEffect, useState} from "react";
 
 
-export default function StringInputComponent({title, value, setterCallback}) {
+export default function StringInputComponent({title, value, setterCallback, orientation}) {
     const [text, setText] = useState('')
 
     useEffect(()=>{
@@ -18,7 +18,7 @@ export default function StringInputComponent({title, value, setterCallback}) {
     }
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, orientation==='row' ? {flexDirection: 'row', justifyContent: 'space-between'} : {flexDirection: 'column', justifyContent: 'center'}]} >
             <View style={styles.description}>
                 <Text>{title}</Text>
             </View>
@@ -37,8 +37,6 @@ export default function StringInputComponent({title, value, setterCallback}) {
 
 const styles = StyleSheet.create({
     container: {
-        flexDirection: 'column',
-        justifyContent: 'center',
         alignItems: 'center',
     },
 

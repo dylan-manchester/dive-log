@@ -5,6 +5,8 @@ import {Dive} from "../../models/DiveModel";
 import {Gear} from "../../models/GearModel";
 import {Site} from "../../models/SiteModel";
 import {EventEmitter} from "../../Data/EventEmitter"
+import * as UnitConverter from "../../Data/UnitConverter"
+
 
 
 
@@ -72,19 +74,19 @@ export default function DiveViewScreen({route, navigation}) {
                             <Text style={styles.title}>Gear Config</Text>
                             <Text style={styles.subtitle}>Name: {gear.name}</Text>
                             {settings["Show Cylinder Type"] ? <Text style={styles.subtitle}>Cylinder Type: {gear.cylinderType}</Text> : null}
-                            {settings["Show Cylinder Size"] ? <Text style={styles.subtitle}>Cylinder Size: {gear.cylinderSize}</Text> : null}
+                            {settings["Show Cylinder Size"] ? <Text style={styles.subtitle}>Cylinder Size: {settings["Units"] ? UnitConverter.cuft2L(parseFloat(gear.cylinderSize)).toFixed(0)+" L" : parseFloat(gear.cylinderSize).toFixed(0)+" ft^3"}</Text> : null}
                         </Pressable>
-                        {settings["Show Depth"] ? <Text style={styles.subtitle}>Depth: {dive.depth} ft</Text> : null}
+                        {settings["Show Depth"] ? <Text style={styles.subtitle}>Depth: {settings["Units"] ? UnitConverter.ft2m(parseFloat(dive.depth)).toFixed(0)+" m" : parseFloat(dive.depth).toFixed(0) +" ft"}</Text> : null}
                         {settings["Show Duration"] ? <Text style={styles.subtitle}>Duration: {dive.duration} min</Text> : null}
-                        {settings["Show Weight"] ? <Text style={styles.subtitle}>Weight: {dive.weight} lbs</Text> : null}
+                        {settings["Show Weight"] ? <Text style={styles.subtitle}>Weight: {settings["Units"] ? UnitConverter.lbs2kg(parseFloat(dive.weight)).toFixed(0)+" kg" : parseFloat(dive.weight).toFixed(0) +" lbs"}</Text> : null}
                         {settings["Show Exposure"] ? <Text style={styles.subtitle}>Exposure Suit: {dive.exposure}</Text> : null}
-                        {settings["Show PSI"] ? <Text style={styles.subtitle}>Starting PSI: {dive.startingPSI}</Text> : null}
-                        {settings["Show PSI"] ? <Text style={styles.subtitle}>Ending PSI: {dive.endingPSI}</Text> : null}
-                        {settings["Show Notes 1"] ? <Text style={styles.subtitle}>{settings["Note 1 Name"]}: {dive.notes1}</Text> : null}
-                        {settings["Show Notes 2"] ? <Text style={styles.subtitle}>{settings["Note 2 Name"]}: {dive.notes2}</Text> : null}
-                        {settings["Show Notes 3"] ? <Text style={styles.subtitle}>{settings["Note 3 Name"]}: {dive.notes3}</Text> : null}
-                        {settings["Show Notes 4"] ? <Text style={styles.subtitle}>{settings["Note 4 Name"]}: {dive.notes4}</Text> : null}
-                        {settings["Show Notes 5"] ? <Text style={styles.subtitle}>{settings["Note 5 Name"]}: {dive.notes5}</Text> : null}
+                        {settings["Show PSI"] ? <Text style={styles.subtitle}>Starting Pressure: {settings["Units"] ? UnitConverter.psi2bar(parseFloat(dive.startingPSI)).toFixed(0)+" bar" : parseFloat(dive.startingPSI).toFixed(0) +" psi"}</Text> : null}
+                        {settings["Show PSI"] ? <Text style={styles.subtitle}>Ending Pressure: {settings["Units"] ? UnitConverter.psi2bar(parseFloat(dive.endingPSI)).toFixed(0)+" bar" : parseFloat(dive.endingPSI).toFixed(0) +" psi"}</Text> : null}
+                        {settings["Note 1"]["Show"] ? <Text style={styles.subtitle}>{settings["Note 1"]["Name"]}: {dive.notes1}</Text> : null}
+                        {settings["Note 2"]["Show"] ? <Text style={styles.subtitle}>{settings["Note 2"]["Name"]}: {dive.notes2}</Text> : null}
+                        {settings["Note 3"]["Show"] ? <Text style={styles.subtitle}>{settings["Note 3"]["Name"]}: {dive.notes3}</Text> : null}
+                        {settings["Note 4"]["Show"] ? <Text style={styles.subtitle}>{settings["Note 4"]["Name"]}: {dive.notes4}</Text> : null}
+                        {settings["Note 5"]["Show"] ? <Text style={styles.subtitle}>{settings["Note 5"]["Name"]}: {dive.notes5}</Text> : null}
                     </ScrollView>
                 </View>
                 : <Image source={require("../../assets/loading.gif")}/> }

@@ -7,6 +7,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import {EventEmitter} from "../../Data/EventEmitter"
 import {Gear} from "../../models/GearModel"
 import {Site} from "../../models/SiteModel"
+import * as UnitConverter from "../../Data/UnitConverter"
 
 export default function DiveEntryScreen({route, navigation}) {
     const {destination} = route.params
@@ -158,17 +159,17 @@ export default function DiveEntryScreen({route, navigation}) {
 
 
     const opts2 = ready ? [
-        {toggle: settings["Show Depth"], title: "Depth", intervals: [1, 10, 25], value: depth, callback: setDepth},
+        {toggle: settings["Show Depth"], title: settings["Units"] ? "Depth (m)" : "Depth (ft)", intervals: [1, 10, 25], value: depth, callback: setDepth},
         {toggle: settings["Show Duration"], title: "Duration", intervals: [1, 10, 25], value: duration, callback: setDuration},
-        {toggle: settings["Show Weight"], title: "Weight", intervals: [1, 10, 25], value: weight, callback: setWeight},
+        {toggle: settings["Show Weight"], title: settings["Units"] ? "Weight (kg)" : "Weight (lbs)", intervals: [1, 10, 25], value: weight, callback: setWeight},
         {toggle: settings["Show Exposure"], title: "Exposure Suit", options: ["3mm", "5mm", "7mm", "dry"], value: exposure, callback: setExposure},
-        {toggle: settings["Show PSI"], title: "Starting PSI", intervals: [50, 100, 500], value: startingPSI, callback: setStartingPSI},
-        {toggle: settings["Show PSI"], title: "Ending PSI", intervals: [50, 100, 500], value: endingPSI, callback: setEndingPSI},
-        {toggle: settings["Show Notes 1"], title: settings["Note 1 Name"], value: notes1, callback: setNotes1},
-        {toggle: settings["Show Notes 2"], title: settings["Note 2 Name"], value: notes2, callback: setNotes2},
-        {toggle: settings["Show Notes 3"], title: settings["Note 3 Name"], value: notes3, callback: setNotes3},
-        {toggle: settings["Show Notes 4"], title: settings["Note 4 Name"], value: notes4, callback: setNotes4},
-        {toggle: settings["Show Notes 5"], title: settings["Note 5 Name"], value: notes5, callback: setNotes5},
+        {toggle: settings["Show PSI"], title: settings["Units"] ? "Starting Pressure (bar)" : "Starting Pressure (psi)" , intervals: [50, 100, 500], value: startingPSI, callback: setStartingPSI},
+        {toggle: settings["Show PSI"], title: settings["Units"] ? "Ending Pressure (bar)" : "Ending Pressure (psi)", intervals: [50, 100, 500], value: endingPSI, callback: setEndingPSI},
+        {toggle: settings["Note 1"]["Show"], title: settings["Note 1"]["Name"], value: notes1, callback: setNotes1},
+        {toggle: settings["Note 2"]["Show"], title: settings["Note 2"]["Name"], value: notes2, callback: setNotes2},
+        {toggle: settings["Note 3"]["Show"], title: settings["Note 3"]["Name"], value: notes3, callback: setNotes3},
+        {toggle: settings["Note 4"]["Show"], title: settings["Note 4"]["Name"], value: notes4, callback: setNotes4},
+        {toggle: settings["Note 5"]["Show"], title: settings["Note 5"]["Name"], value: notes5, callback: setNotes5},
     ] : []
 
     const onChange = (event, selectedDateTime) => {
@@ -189,7 +190,12 @@ export default function DiveEntryScreen({route, navigation}) {
             if (gearID === undefined) alertMessage += "Please Select a Gear Configuration\n"
             Alert.alert("Halt!", alertMessage)
         } else {
-            const value = new Dive().initFromValues(dateTime, siteID, siteName, gearID, gearName, depth, duration, weight, exposure, startingPSI, endingPSI, notes1, notes2, notes3, notes4, notes5)
+            if (settings["Units"]) {
+                const value = new Dive().initFromValues(dateTime, siteID, siteName, gearID, gearName, UnitConverter.m2ft(depth), duration, UnitConverter.kg2lbs(weight), exposure,UnitConverter.bar2psi(startingPSI),UnitConverter.bar2psi(endingPSI), notes1, notes2, notes3, notes4, notes5)
+            }
+            else {
+                const value = new Dive().initFromValues(dateTime, siteID, siteName, gearID, gearName, depth, duration, weight, exposure, startingPSI, endingPSI, notes1, notes2, notes3, notes4, notes5)
+            }
             if (id == null) {
                 newObject("dives", value).then(() => navigation.navigate("selectDive", {destination: destination}))
             } else {

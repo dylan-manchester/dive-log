@@ -5,6 +5,8 @@ import {get, newObject, set} from "../../Data/DAO";
 import {Site} from "../../models/SiteModel";
 import * as Location from 'expo-location';
 import {EventEmitter} from "../../Data/EventEmitter"
+import * as UnitConverter from "../../Data/UnitConverter"
+
 
 export default function SiteEntryScreen({route, navigation}) {
     const {destination} = route.params;
@@ -60,11 +62,16 @@ export default function SiteEntryScreen({route, navigation}) {
         {toggle: true, title: "Name", value: name, callback: setName},
         {toggle: settings["Show Water Type"], title: "Water Type", options: ["Salt", "Fresh"], value: waterType, callback: setWaterType},
         {toggle: settings["Show Location"], title: "Location", latitude: latitude, longitude: longitude, latitudeCallback: setLatitude, longitudeCallback: setLongitude},
-        {toggle: settings["Show Default Depth"], title: "Default Depth", intervals: [1, 10, 25], value: defaultDepth, callback: setDefaultDepth},
+        {toggle: settings["Show Default Depth"], title: settings["Units"] ? "Default Depth (m)" : "Default Depth (ft)", intervals: [1, 10, 25], value: defaultDepth, callback: setDefaultDepth},
     ] : []
 
     const submit = () => {
-        const value = new Site().initFromValues(name, latitude, longitude, waterType, defaultDepth)
+        if (settings["Units"]) {
+            const value = new Site().initFromValues(name, latitude, longitude, waterType,UnitConverter.m2ft(defaultDepth))
+        } else {
+            const value = new Site().initFromValues(name, latitude, longitude, waterType, defaultDepth)
+
+        }
         console.log("HERE!")
         console.log(value)
         if (id == null) {

@@ -4,6 +4,8 @@ import DataInputComponent from "../../components/DataInputComponent";
 import {get, newObject, set} from "../../Data/DAO";
 import {Gear} from "../../models/GearModel";
 import {EventEmitter} from "../../Data/EventEmitter"
+import * as UnitConverter from "../../Data/UnitConverter"
+
 
 export default function GearEntryScreen({route, navigation}) {
     const {destination} = route.params;
@@ -58,13 +60,18 @@ export default function GearEntryScreen({route, navigation}) {
     const opts2 = ready ? [
         {toggle: true, title: "Name", value: name, callback: setName},
         {toggle: settings["Show Cylinder Type"], title: "Cylinder Type", options: ["Aluminum", "Steel", "CCR"], value: cylinderType, callback: setCylinderType},
-        {toggle: settings["Show Cylinder Size"], title: "Cylinder Size", intervals: [1, 10, 25], value: cylinderSize, callback: setCylinderSize},
-        {toggle: settings["Show Default Weight"], title: "Default Weight", intervals: [1, 10, 25], value: defaultWeight, callback: setDefaultWeight},
-        {toggle: settings["Show Default PSI"], title: "Default Starting PSI", intervals: [50, 100, 500], value: defaultStaringPSI, callback: setDefaultStaringPSI},
+        {toggle: settings["Show Cylinder Size"], title: settings["Units"] ? "Cylinder Size (L)" : "Cylinder Type (ft^3)", intervals: [1, 10, 25], value: cylinderSize, callback: setCylinderSize},
+        {toggle: settings["Show Default Weight"], title: settings["Units"] ? "Default Weight (kg)" : "Default Weight (lbs)" , intervals: [1, 10, 25], value: defaultWeight, callback: setDefaultWeight},
+        {toggle: settings["Show Default PSI"], title: settings["Units"] ? "Default Starting Pressure (bar)" : "Default Starting Pressure (psi)", intervals: [50, 100, 500], value: defaultStaringPSI, callback: setDefaultStaringPSI},
     ] : []
 
     const submit = () => {
-        const value = new Gear().initFromValues(name, cylinderType, cylinderSize, defaultWeight, defaultStaringPSI)
+        if (settings["Units"]) {
+            const value = new Gear().initFromValues(name, cylinderType, UnitConverter.L2cuft(cylinderSize), UnitConverter.kg2lbs(defaultWeight),UnitConverter.bar2psi(defaultStaringPSI))
+        } else {
+            const value = new Gear().initFromValues(name, cylinderType, cylinderSize, defaultWeight, defaultStaringPSI)
+
+        }
         if (id == null) {
             newObject("gear",value).then((key)=>navigation.navigate("selectGear", {destination: destination}))
         } else {

@@ -1,28 +1,14 @@
 import {StyleSheet, Text, View, Pressable, Image} from 'react-native'
-import {Menu, MenuOption, MenuOptions, MenuTrigger} from "react-native-popup-menu";
-import {useState} from "react";
+import {useRef} from "react";
+import MenuComponent from "./MenuComponent";
 
-interface CardProps {
-    title: string;
-    subtitle1: string;
-    subtitle2: string;
-    subtitle3: string;
-    favorite: boolean;
-    pressAction: function;
-    editAction: function;
-    deleteAction: function;
-    favoriteAction: function;
-    exportAction: function;
-    importAction: function;
-}
-
-export default function CardComponent({title, subtitle1, subtitle2, subtitle3, favorite, pressAction, editAction, deleteAction, favoriteAction, exportAction, importAction}: CardProps) {
-    const [opened, setOpened] = useState(false)
+export default function CardComponent({title, subtitle1, subtitle2, subtitle3, favorite, pressAction, editAction, deleteAction, favoriteAction, exportAction, importAction}) {
+    const menuRef = useRef()
     return (
         <View key={title} style={styles.container}>
             <Pressable style={({pressed})=>[pressed ? styles.pressed : styles.unpressed ,styles.pressable]}
                        onPress={pressAction}
-            onLongPress={()=>setOpened(true)}>
+            onLongPress={()=>menuRef.current.openMenu()}>
                 <View style={styles.title}>
                     <Text style={styles.title}>{title}</Text>
                 </View>
@@ -31,50 +17,7 @@ export default function CardComponent({title, subtitle1, subtitle2, subtitle3, f
                         <Image style={styles.image} source={require("../assets/star.png")}/>
                     </View>
                     : <View/>}
-                <Menu
-                    opened={opened}
-                    onBackdropPress={() => setOpened(false)}>
-                    <MenuTrigger/>
-                    <MenuOptions>
-                        {editAction!=null ? <MenuOption onSelect={()=>{
-                            setOpened(false)
-                            editAction()
-                        }}>
-                            <Text>Edit</Text>
-                        </MenuOption> : null}
-                        {deleteAction!=null?
-                            <MenuOption onSelect={()=>{
-                                setOpened(false)
-                                deleteAction()
-                            }}>
-                                <Text>Delete</Text>
-                            </MenuOption> : null }
-                        {favoriteAction!=null ?
-                            <MenuOption onSelect={() => {
-                                setOpened(false)
-                                favoriteAction()
-                            }}>
-                                <Text>Favorite</Text>
-                            </MenuOption>
-                            : null }
-                        {exportAction!=null ?
-                            <MenuOption onSelect={() => {
-                                setOpened(false)
-                                exportAction()
-                            }}>
-                                <Text>Copy to Clipboard</Text>
-                            </MenuOption>
-                            : null }
-                        {importAction!=null ?
-                            <MenuOption onSelect={() => {
-                                setOpened(false)
-                                importAction()
-                            }}>
-                                <Text>Create from Clipboard</Text>
-                            </MenuOption>
-                            : null }
-                    </MenuOptions>
-                </Menu>
+                <MenuComponent ref={menuRef} deleteAction={deleteAction} exportAction={exportAction} favoriteAction={favoriteAction} editAction={editAction} importAction={importAction}/>
                 <View style={styles.subtitles}>
                     <Text style={styles.subtitle}>{subtitle1}</Text>
                     <Text style={styles.subtitle}>{subtitle2}</Text>

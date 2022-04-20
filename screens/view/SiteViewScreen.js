@@ -3,6 +3,8 @@ import {get} from "../../Data/DAO";
 import React, {useEffect, useState} from "react";
 import {Site} from "../../models/SiteModel";
 import {EventEmitter} from "../../Data/EventEmitter"
+import * as UnitConverter from "../../Data/UnitConverter"
+
 
 export default function SiteViewScreen({route}) {
     const {site_id} = route.params
@@ -40,7 +42,7 @@ export default function SiteViewScreen({route}) {
                     <Text style={styles.title}>{site.name}</Text>
                     {settings["Show Location"] ? <Text style={styles.subtitle}>Location: ({site.latitude},{site.longitude})</Text> : null }
                     {settings["Show Water Type"] ? <Text style={styles.subtitle}>Water Type: {site.waterType}</Text> : null }
-                    {settings["Show Default Depth"] ?<Text style={styles.subtitle}>Default Depth: {site.defaultDepth} ft</Text> : null }
+                    {settings["Show Default Depth"] ?<Text style={styles.subtitle}>Default Depth: {settings["Units"] ? UnitConverter.ft2m(parseFloat(site.defaultDepth)).toFixed(0)+" m" : parseFloat(site.defaultDepth).toFixed(0) +" ft"}</Text> : null }
                 </View>
                 : <Image source={require("../../assets/loading.gif")}/> }
         </View>

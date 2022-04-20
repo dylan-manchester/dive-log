@@ -4,6 +4,8 @@ import {StyleSheet, View, FlatList, Image} from "react-native";
 import {getAll, get, set, deleteObject} from "../../Data/DAO";
 import {useFocusEffect} from "@react-navigation/native";
 import {EventEmitter} from "../../Data/EventEmitter"
+import * as UnitConverter from "../../Data/UnitConverter"
+
 
 export default function SiteSelectScreen({route, navigation}) {
     const {destination} = route.params
@@ -65,7 +67,7 @@ export default function SiteSelectScreen({route, navigation}) {
             title={item.name}
             subtitle1={settings["Show Location"] ? "("+ ((!isNaN(parseFloat(item.latitude))) ? parseFloat(item.latitude).toFixed(3) : item.latitude)+", "+((!isNaN(parseFloat(item.longitude))) ? parseFloat(item.longitude).toFixed(3) : item.longitude)+")" : ""}
             subtitle2={settings["Show Water Type"] ? item.waterType : ""}
-            subtitle3={settings["Show Default Depth"] ? item.defaultDepth+" ft" : ""}
+            subtitle3={settings["Show Default Depth"] ? settings["Units"] ? UnitConverter.ft2m(parseFloat(item.defaultDepth)).toFixed(0)+" m" : parseFloat(item.defaultDepth).toFixed(0)+" ft" : ""}
             favorite={item.id === favorite}
             pressAction={() => selectAction(item.id)}
             editAction={() => editItem(item.id)}

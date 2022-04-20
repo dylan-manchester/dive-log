@@ -4,6 +4,8 @@ import {StyleSheet, View, FlatList, Image} from "react-native";
 import {deleteObject, get, getAll, set} from "../../Data/DAO";
 import {useFocusEffect} from "@react-navigation/native";
 import {EventEmitter} from "../../Data/EventEmitter"
+import * as UnitConverter from "../../Data/UnitConverter"
+
 
 export default function GearSelectScreen({route, navigation}) {
     const {destination} = route.params
@@ -68,7 +70,7 @@ export default function GearSelectScreen({route, navigation}) {
         <CardComponent
             title={item.name}
             subtitle1= {settings["Show Cylinder Type"] ? item.cylinderType : ""}
-            subtitle2= {settings["Show Cylinder Size"] ? item.cylinderSize: ""}
+            subtitle2= {settings["Show Cylinder Size"] ? settings["Units"] ? UnitConverter.psi2bar(parseFloat(item.cylinderSize)).toFixed(0)+" bar" : parseFloat(item.cylinderSize).toFixed(0)+" psi" : ""}
             subtitle3= ""
             favorite={item.id === favorite}
             pressAction={() => selectAction(item.id)}
