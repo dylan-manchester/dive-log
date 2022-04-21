@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import * as Application from 'expo-application';
-import {get} from "../Data/DAO";
-import {availableHeaders} from "../Data/IO";
+import {get} from "../data/DAO";
+import {availableHeaders} from "../data/IO";
 
 
 export default function StatsScreen({navigation}) {
@@ -11,6 +11,8 @@ export default function StatsScreen({navigation}) {
     const [trigger, setTrigger] = useState(0)
     const [dives, setDives] = useState(0)
     const [sites, setSites] = useState(0)
+    const [totalDiveTime, setTotalDiveTime] = useState(0)
+    const [maxDepth, setMaxDepth] = useState(0)
 
 
     useEffect(()=>{
@@ -19,8 +21,12 @@ export default function StatsScreen({navigation}) {
             if (isMounted) {
                 setSettings(rv)
                 get("dives").then((rv) => {
+                    let totalDiveTime = rv.reduce((sum, dive)=>sum+dive.duration, 0)
+                    let maxDepth = rv.reduce((max, dive)=>dive.depth>max ? dive.depth : max, 0)
                     if (isMounted) {
                         setDives(rv.length)
+                        setTotalDiveTime(totalDiveTime)
+                        setMaxDepth(maxDepth)
                         get("sites").then((rv) => {
                             setSites(rv.length)
                             setReady(true)
@@ -37,7 +43,9 @@ export default function StatsScreen({navigation}) {
             {ready ?
                 <View style={styles.content}>
                     <Text>Total Dives: {dives}</Text>
-                    <Text>Total Sites: {sites}</Text>
+                    <Text>Unique Sites: {sites}</Text>
+                    <Text>Total Dive Time: </Text>
+                    <Text>Max Depth: </Text>
                     <Text>Version: {Application.nativeApplicationVersion}</Text>
                     <Text>Headers: {availableHeaders()}</Text>
                 </View>

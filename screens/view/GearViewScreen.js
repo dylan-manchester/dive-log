@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View, Image} from 'react-native';
-import {get} from "../../Data/DAO";
+import {StyleSheet, Text, View, Image, Alert} from 'react-native';
+import {deleteObject, get} from "../../data/DAO";
 import {Gear} from "../../models/GearModel";
-import {EventEmitter} from "../../Data/EventEmitter"
-import * as UnitConverter from "../../Data/UnitConverter"
+import {EventEmitter} from "../../data/EventEmitter"
+import * as UnitConverter from "../../data/UnitConverter"
+import ModalMenuComponent from "../../components/ModalMenuComponent";
 
 
-export default function GearViewScreen({route}) {
+export default function GearViewScreen({navigation, route}) {
     const {gear_id} = route.params;
     const [gear, setGear] = useState(new Gear())
     const constant = true
@@ -22,6 +23,16 @@ export default function GearViewScreen({route}) {
     useEffect(()=>{
         let isMounted = true
         get("settings").then((rv)=>{
+            navigation.setOptions({
+                headerRight: () => (
+                    <ModalMenuComponent
+                        options={[
+                            {action:()=>editItem(gear_id), text: "Edit"},
+                            {action:()=>deleteItem(gear_id), text: "Delete"}
+                        ]}
+                    />
+                )
+            })
             if (isMounted) {
                 setSettings(rv)
                 get(gear_id).then((rv) => {
@@ -34,6 +45,17 @@ export default function GearViewScreen({route}) {
         })
         return () => {isMounted = false}
     },[trigger])
+
+    const deleteItem = async (id) => {
+        let success = await deleteObject("gear", id)
+        if (success) {
+            navigation.goBack()
+        } else {
+            Alert.alert(`Error`, 'Please remove dependent dives first')
+        }
+    }
+
+    const editItem = (id) => navigation.navigate("entryGear", {destination: "viewGear", gear_id: id})
 
 
     return (

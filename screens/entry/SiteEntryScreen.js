@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {Pressable, ScrollView, StyleSheet, Text} from 'react-native';
-import DataInputComponent from "../../components/DataInputComponent";
-import {get, newObject, set} from "../../Data/DAO";
+import DataInputComponent from "../../components/dataInputComponents/DataInputWrapperComponent";
+import {get, newObject, set} from "../../data/DAO";
 import {Site} from "../../models/SiteModel";
 import * as Location from 'expo-location';
-import {EventEmitter} from "../../Data/EventEmitter"
-import * as UnitConverter from "../../Data/UnitConverter"
+import {EventEmitter} from "../../data/EventEmitter"
+import * as UnitConverter from "../../data/UnitConverter"
 
 
 export default function SiteEntryScreen({route, navigation}) {
@@ -66,10 +66,11 @@ export default function SiteEntryScreen({route, navigation}) {
     ] : []
 
     const submit = () => {
+        let value
         if (settings["Units"]) {
-            const value = new Site().initFromValues(name, latitude, longitude, waterType,UnitConverter.m2ft(defaultDepth))
+            value = new Site().initFromValues(name, latitude, longitude, waterType,UnitConverter.m2ft(defaultDepth))
         } else {
-            const value = new Site().initFromValues(name, latitude, longitude, waterType, defaultDepth)
+            value = new Site().initFromValues(name, latitude, longitude, waterType, defaultDepth)
 
         }
         console.log("HERE!")

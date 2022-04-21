@@ -1,13 +1,15 @@
-import React, {useEffect, useState} from 'react';
-import {Pressable, Image, StyleSheet, Text, View, ScrollView} from 'react-native';
-import {get, wait} from "../../Data/DAO";
+import React, {useEffect, useRef, useState} from 'react';
+import {Pressable, Image, StyleSheet, Text, View, ScrollView, Alert} from 'react-native';
+import {deleteObject, get, wait} from "../../data/DAO";
 import {Dive} from "../../models/DiveModel";
 import {Gear} from "../../models/GearModel";
 import {Site} from "../../models/SiteModel";
-import {EventEmitter} from "../../Data/EventEmitter"
-import * as UnitConverter from "../../Data/UnitConverter"
-
-
+import {EventEmitter} from "../../data/EventEmitter"
+import * as UnitConverter from "../../data/UnitConverter"
+import Clipboard from "expo-clipboard";
+import {exportableDive} from "../../data/IO";
+import MenuComponent from "../../components/MenuComponent";
+import ModalMenuComponent from "../../components/ModalMenuComponent";
 
 
 export default function DiveViewScreen({route, navigation}) {
@@ -30,6 +32,16 @@ export default function DiveViewScreen({route, navigation}) {
         let isMounted = true
         wait(800).then(()=>
             get("settings").then((rv)=>{
+                navigation.setOptions({
+                    headerRight: () => (
+                        <ModalMenuComponent
+                            options={[
+                                {action: () => editItem(dive_id), text: "Edit"},
+                                {action: () => deleteItem(dive_id), text: "Delete"}
+                            ]}
+                        />
+                    )
+                })
                 if (isMounted) {
                     setSettings(rv)
                     get(dive_id).then((rv) => {
@@ -56,6 +68,20 @@ export default function DiveViewScreen({route, navigation}) {
         })
         return () => {isMounted = false}
     },[trigger])
+
+
+    const deleteItem = async (id) => {
+        let success = await deleteObject("dives", id)
+        if (success) {
+            navigation.goBack()
+        } else {
+            Alert.alert(`Error`, 'Please try again')
+        }
+    }
+
+    const editItem = (id) => navigation.navigate("entryDive", {destination: "viewDive", dive_id: id})
+
+    //const exportItem = async (item) => Clipboard.setString(JSON.stringify(await exportableDive({...item})))
 
 
     return (

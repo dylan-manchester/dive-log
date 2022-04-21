@@ -1,12 +1,13 @@
-import {StyleSheet, Text, View, Image} from "react-native";
-import {get} from "../../Data/DAO";
+import {StyleSheet, Text, View, Image, Alert} from "react-native";
+import {deleteObject, get} from "../../data/DAO";
 import React, {useEffect, useState} from "react";
 import {Site} from "../../models/SiteModel";
-import {EventEmitter} from "../../Data/EventEmitter"
-import * as UnitConverter from "../../Data/UnitConverter"
+import {EventEmitter} from "../../data/EventEmitter"
+import * as UnitConverter from "../../data/UnitConverter"
+import ModalMenuComponent from "../../components/ModalMenuComponent";
 
 
-export default function SiteViewScreen({route}) {
+export default function SiteViewScreen({navigation, route}) {
     const {site_id} = route.params
     const [site, setSite] = useState(new Site())
     const constant = true
@@ -22,6 +23,16 @@ export default function SiteViewScreen({route}) {
     useEffect(()=>{
         let isMounted = true
         get("settings").then((rv)=>{
+            navigation.setOptions({
+                headerRight: () => (
+                    <ModalMenuComponent
+                        options={[
+                            {action:()=>editItem(site_id), text: "Edit"},
+                            {action:()=>deleteItem(site_id), text: "Delete"}
+                        ]}
+                    />
+                )
+            })
             if (isMounted) {
                 setSettings(rv)
                 get(site_id).then((rv) => {
@@ -34,6 +45,17 @@ export default function SiteViewScreen({route}) {
         })
         return () => {isMounted = false}
         },[trigger])
+
+    const deleteItem = async (id) => {
+        let success = await deleteObject("sites", id)
+        if (success) {
+            navigation.goBack()
+        } else {
+            Alert.alert(`Error`, 'Please remove dependent dives first')
+        }
+    }
+
+    const editItem = (id) => navigation.navigate("entrySite", {destination: "viewSite", site_id: id})
 
     return (
         <View style={styles.container}>

@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {Pressable, StyleSheet, Text, ScrollView} from 'react-native';
-import DataInputComponent from "../../components/DataInputComponent";
-import {get, newObject, set} from "../../Data/DAO";
+import DataInputComponent from "../../components/dataInputComponents/DataInputWrapperComponent";
+import {get, newObject, set} from "../../data/DAO";
 import {Gear} from "../../models/GearModel";
-import {EventEmitter} from "../../Data/EventEmitter"
-import * as UnitConverter from "../../Data/UnitConverter"
+import {EventEmitter} from "../../data/EventEmitter"
+import * as UnitConverter from "../../data/UnitConverter"
 
 
 export default function GearEntryScreen({route, navigation}) {
@@ -66,11 +66,11 @@ export default function GearEntryScreen({route, navigation}) {
     ] : []
 
     const submit = () => {
+        let value
         if (settings["Units"]) {
-            const value = new Gear().initFromValues(name, cylinderType, UnitConverter.L2cuft(cylinderSize), UnitConverter.kg2lbs(defaultWeight),UnitConverter.bar2psi(defaultStaringPSI))
+            value = new Gear().initFromValues(name, cylinderType, UnitConverter.L2cuft(cylinderSize), UnitConverter.kg2lbs(defaultWeight),UnitConverter.bar2psi(defaultStaringPSI))
         } else {
-            const value = new Gear().initFromValues(name, cylinderType, cylinderSize, defaultWeight, defaultStaringPSI)
-
+            value = new Gear().initFromValues(name, cylinderType, cylinderSize, defaultWeight, defaultStaringPSI)
         }
         if (id == null) {
             newObject("gear",value).then((key)=>navigation.navigate("selectGear", {destination: destination}))

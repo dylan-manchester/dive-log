@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {Platform, Pressable, StyleSheet, Text, ScrollView, Alert} from 'react-native';
-import DataInputComponent from "../../components/DataInputComponent";
-import {get, set, newObject} from "../../Data/DAO";
+import DataInputComponent from "../../components/dataInputComponents/DataInputWrapperComponent";
+import {get, set, newObject} from "../../data/DAO";
 import {Dive} from "../../models/DiveModel";
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {EventEmitter} from "../../Data/EventEmitter"
+import {EventEmitter} from "../../data/EventEmitter"
 import {Gear} from "../../models/GearModel"
 import {Site} from "../../models/SiteModel"
-import * as UnitConverter from "../../Data/UnitConverter"
+import * as UnitConverter from "../../data/UnitConverter"
 
 export default function DiveEntryScreen({route, navigation}) {
     const {destination} = route.params
@@ -190,11 +190,12 @@ export default function DiveEntryScreen({route, navigation}) {
             if (gearID === undefined) alertMessage += "Please Select a Gear Configuration\n"
             Alert.alert("Halt!", alertMessage)
         } else {
+            let value
             if (settings["Units"]) {
-                const value = new Dive().initFromValues(dateTime, siteID, siteName, gearID, gearName, UnitConverter.m2ft(depth), duration, UnitConverter.kg2lbs(weight), exposure,UnitConverter.bar2psi(startingPSI),UnitConverter.bar2psi(endingPSI), notes1, notes2, notes3, notes4, notes5)
+                value = new Dive().initFromValues(dateTime, siteID, siteName, gearID, gearName, UnitConverter.m2ft(depth), duration, UnitConverter.kg2lbs(weight), exposure,UnitConverter.bar2psi(startingPSI),UnitConverter.bar2psi(endingPSI), notes1, notes2, notes3, notes4, notes5)
             }
             else {
-                const value = new Dive().initFromValues(dateTime, siteID, siteName, gearID, gearName, depth, duration, weight, exposure, startingPSI, endingPSI, notes1, notes2, notes3, notes4, notes5)
+                value = new Dive().initFromValues(dateTime, siteID, siteName, gearID, gearName, depth, duration, weight, exposure, startingPSI, endingPSI, notes1, notes2, notes3, notes4, notes5)
             }
             if (id == null) {
                 newObject("dives", value).then(() => navigation.navigate("selectDive", {destination: destination}))

@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from "react";
 import CardComponent from "../../components/CardComponent";
 import {StyleSheet, View, FlatList, Image} from "react-native";
-import {deleteObject, get, getAll, set} from "../../Data/DAO";
+import {deleteObject, get, getAll, set} from "../../data/DAO";
 import {useFocusEffect} from "@react-navigation/native";
-import {EventEmitter} from "../../Data/EventEmitter"
-import * as UnitConverter from "../../Data/UnitConverter"
+import {EventEmitter} from "../../data/EventEmitter"
+import * as UnitConverter from "../../data/UnitConverter"
 
 
 export default function GearSelectScreen({route, navigation}) {

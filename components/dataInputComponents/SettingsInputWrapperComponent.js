@@ -3,7 +3,7 @@ import StringInputComponent from "./StringInputComponent";
 import SwitchInputComponent from "./SwitchInputComponent";
 import NotesInputComponent from "./NotesInputComponent";
 
-export default function SettingInputComponent({props}) {
+export default function SettingsInputWrapperComponent({props}) {
 
     return (
         <View style={styles.container}>

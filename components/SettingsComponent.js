@@ -1,11 +1,11 @@
 import {Pressable, StyleSheet, Text, View, ScrollView} from "react-native";
 import {useEffect, useState} from "react";
-import {set, get} from "../Data/DAO"
-import SettingInputComponent from "./SettingInputComponent"
+import {set, get} from "../data/DAO"
+import SettingsInputWrapperComponent from "./dataInputComponents/SettingsInputWrapperComponent"
 import {Settings} from "../models/SettingsModel"
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {EventEmitter} from "../Data/EventEmitter"
-import {exportAllDives, importFile} from "../Data/IO";
+import {EventEmitter} from "../data/EventEmitter"
+import {exportAllDives, importFile} from "../data/IO";
 
 export default function SettingsComponent({close}) {
     const constant = true
@@ -33,7 +33,7 @@ export default function SettingsComponent({close}) {
         set("settings", settings).then(()=>console.log("Set")).catch(e=>console.log(e))
     }
 
-    const importCSV = ()=>importFile().then(()=>console.log("Done"))//()=>alert("Import finished"))
+    const importCSV = ()=>importFile().then(()=>console.log("Done"))
     const exportCSV = exportAllDives
 
 
@@ -67,7 +67,7 @@ export default function SettingsComponent({close}) {
             <ScrollView styles={styles.content} showsVerticalScrollIndicator={false}>
                 {ready ?
                     Object.keys(settings).map((key)=>
-                        <SettingInputComponent key={key.toString()+":"+settings[key].toString()} props={{title: key, value: settings[key], callback: (value)=>updateSetting(key, value)}} />
+                        <SettingsInputWrapperComponent key={key.toString()+":"+settings[key].toString()} props={{title: key, value: settings[key], callback: (value)=>updateSetting(key, value)}} />
                     ) : null
                 }
                 <Pressable style={({pressed})=>[pressed ? styles.pressed : styles.import ,styles.pressable]} onPress={importCSV}>

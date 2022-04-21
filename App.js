@@ -1,26 +1,24 @@
-import React, {useEffect, useState} from 'react';
-import DiveEntryScreen from "./screens/entry/DiveEntryScreen";
+import React, {useEffect} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import HomeScreen from "./screens/HomeScreen";
+import DiveEntryScreen from "./screens/entry/DiveEntryScreen";
 import DiveViewScreen from "./screens/view/DiveViewScreen";
 import DiveSelectScreen from "./screens/select/DiveSelectScreen";
+import GearEntryScreen from "./screens/entry/GearEntryScreen";
 import GearViewScreen from "./screens/view/GearViewScreen";
 import GearSelectScreen from "./screens/select/GearSelectScreen";
+import SiteEntryScreen from "./screens/entry/SiteEntryScreen";
 import SiteViewScreen from "./screens/view/SiteViewScreen";
 import SiteSelectScreen from "./screens/select/SiteSelectScreen";
-import GearEntryScreen from "./screens/entry/GearEntryScreen";
-import SiteEntryScreen from "./screens/entry/SiteEntryScreen";
 import StatsScreen from "./screens/StatsScreen"
-import {get, set} from "./Data/DAO";
-import HomeScreen from "./screens/HomeScreen";
+import ModalMenuComponent from "./components/ModalMenuComponent";
+import {get, set} from "./data/DAO";
 import {MenuProvider} from "react-native-popup-menu";
-import {Pressable, Image, Modal, StyleSheet} from "react-native";
-import SettingsComponent from "./components/SettingsComponent";
 import {Settings} from "./models/SettingsModel"
-import {EventEmitter} from "./Data/EventEmitter"
+
 
 export default function App() {
-    const [refreshes,setRefreshes] = useState(1)
     const constant = null
     const Stack = createNativeStackNavigator();
     useEffect(()=> {
@@ -30,112 +28,86 @@ export default function App() {
         get("settings").then((rv) => console.log("Num of settings: " + Object.keys(rv).length)).catch(() => set("settings", Settings.initialSettings))
     }, [constant])
 
-    const [modalVisible, setModalVisible] = useState(false)
-
-    function triggerSettingsRefresh() {
-        setRefreshes((prev)=>prev+1)
-        console.log("Refreshes: "+refreshes)
-        EventEmitter.dispatch('refreshSiteEntry', refreshes)
-        EventEmitter.dispatch('refreshDiveEntry', refreshes)
-        EventEmitter.dispatch('refreshGearEntry', refreshes)
-        EventEmitter.dispatch('refreshDiveSelect', refreshes)
-        EventEmitter.dispatch('refreshSiteSelect', refreshes)
-        EventEmitter.dispatch('refreshGearSelect', refreshes)
-        EventEmitter.dispatch('refreshGearView', refreshes)
-        EventEmitter.dispatch('refreshSiteView', refreshes)
-        EventEmitter.dispatch('refreshDiveView', refreshes)
-        EventEmitter.dispatch('refreshSettings', refreshes)
-    }
-
     return (
         <MenuProvider>
             <NavigationContainer>
-                <Stack.Navigator>
-                    <Stack.Group
-                        screenOptions={{
-                            headerStyle: {
-                            backgroundColor: '#02adec',
+                <Stack.Navigator
+                    screenOptions={{
+                        headerStyle: {
+                            backgroundColor: '#02adec'
                         },
-                            headerTintColor: '#fff',
-                            headerTitleStyle: {fontWeight: 'bold',
+                        headerTintColor: '#fff',
+                        headerTitleStyle: {
+                            fontWeight: 'bold'
                         },
-                            headerRight: () => (
-                            <Pressable onPress={()=>setModalVisible(true)}>
-                                <Image source={require("./assets/settings.png")}/>
-                            </Pressable>)}}>
+                        headerRight: () => (<ModalMenuComponent options={[]}/>)}}>
+                    <Stack.Group>
                         <Stack.Screen
                             name="home"
                             component={HomeScreen}
-                            options={{title: "Home"}}/>
+                            options={({navigation})=> ({
+                                title: "Home",
+                                headerRight: () => (
+                                    <ModalMenuComponent
+                                        options={[{action: () => navigation.navigate("stats"), text: "Stats"}]}/>
+                                )}
+                            )}/>
                         <Stack.Screen
-                            name="entryDive"
-                            component={DiveEntryScreen}
-                            initialParams={{ destination: "viewDive"}}
-                            options={{title: "Dive Entry"}}/>
+                            name="stats"
+                            component={StatsScreen}
+                            options={{title: "Statistics"}}/>
+                    </Stack.Group>
+                    <Stack.Group>
+                        <Stack.Screen
+                            name="viewDive"
+                            component={DiveViewScreen}
+                            options={{title: "View Dive"}}/>
+                        <Stack.Screen
+                            name="viewGear"
+                            component={GearViewScreen}
+                            options={{title: "View Gear"}}/>
+                        <Stack.Screen
+                            name="viewSite"
+                            component={SiteViewScreen}
+                            options={{title: "View Site"}}/>
+                    </Stack.Group>
+                    <Stack.Group>
                         <Stack.Screen
                             name="selectDive"
                             component={DiveSelectScreen}
                             initialParams={{ destination: "viewDive"}}
                             options={{title: "Select a Dive"}}/>
                         <Stack.Screen
-                            name="viewDive"
-                            component={DiveViewScreen}
-                            options={{title: "View Dive"}}/>
+                            name="selectGear"
+                            component={GearSelectScreen}
+                            initialParams={{ destination: "viewGear"}}
+                            options={{title: "Select Gear"}}/>
+                        <Stack.Screen
+                            name="selectSite"
+                            component={SiteSelectScreen}
+                            initialParams={{ destination: "viewSite"}}
+                            options={{title: "Select a Site"}}/>
+                    </Stack.Group>
+                    <Stack.Group>
+                        <Stack.Screen
+                            name="entryDive"
+                            component={DiveEntryScreen}
+                            initialParams={{ destination: "viewDive"}}
+                            options={{title: "Dive Entry"}}/>
                         <Stack.Screen
                             name="entryGear"
                             component={GearEntryScreen}
                             initialParams={{ destination: "viewGear"}}
                             options={{title: "Gear Entry"}}/>
                         <Stack.Screen
-                            name="selectGear"
-                            component={GearSelectScreen}
-                            initialParams={{ destination: "viewGear"}}
-                            options={{title: "Select Gear"}}/>
-                        <Stack.Screen
-                            name="viewGear"
-                            component={GearViewScreen}
-                            options={{title: "View Gear"}}/>
-                        <Stack.Screen
                             name="entrySite"
                             component={SiteEntryScreen}
                             initialParams={{ destination: "viewSite"}}
                             options={{title: "Site Entry"}}/>
-                        <Stack.Screen
-                            name="selectSite"
-                            component={SiteSelectScreen}
-                            initialParams={{ destination: "viewSite"}}
-                            options={{title: "Select a Site"}}/>
-                        <Stack.Screen
-                            name="viewSite"
-                            component={SiteViewScreen}
-                            options={{title: "View Site"}}/>
-                        <Stack.Screen
-                            name="stats"
-                            component={StatsScreen}
-                            options={{title: "Statistics"}}
-                            />
                     </Stack.Group>
                 </Stack.Navigator>
             </NavigationContainer>
-            <Modal
-                style = {styles.modal}
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => {
-                    triggerSettingsRefresh()
-                    setModalVisible(false)}}>
-                <SettingsComponent close={()=> {
-                    triggerSettingsRefresh()
-                    setModalVisible(false)}}/>
-            </Modal>
         </MenuProvider>
     );
 }
-
-const styles = StyleSheet.create({
-    modal: {
-        marginTop: 30,
-    }
-})
 

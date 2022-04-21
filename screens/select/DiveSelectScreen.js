@@ -1,13 +1,12 @@
 import React, {useEffect, useState} from "react";
 import CardComponent from "../../components/CardComponent";
 import {StyleSheet, View, FlatList, Image, Alert} from "react-native";
-import {deleteObject, getAll, get} from "../../Data/DAO";
+import {deleteObject, getAll, get} from "../../data/DAO";
 import {useFocusEffect} from "@react-navigation/native";
 import * as Clipboard from 'expo-clipboard';
-import {EventEmitter} from "../../Data/EventEmitter"
-import {exportableDive, importDive} from "../../Data/IO";
-import * as UnitConverter from "../../Data/UnitConverter"
-
+import {EventEmitter} from "../../data/EventEmitter"
+import {exportableDive, importDive} from "../../data/IO";
+import * as UnitConverter from "../../data/UnitConverter"
 
 
 export default function DiveSelectScreen({route, navigation}) {
@@ -51,7 +50,7 @@ export default function DiveSelectScreen({route, navigation}) {
         let success = await deleteObject("dives", id)
         if (success) {
             setDives([])
-            setTrigger(trigger+1)
+            setTrigger((prev)=>prev+1)
         } else {
             Alert.alert(`Error`, 'Please try again')
         }

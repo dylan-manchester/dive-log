@@ -3,7 +3,13 @@ import {useRef} from "react";
 import MenuComponent from "./MenuComponent";
 
 export default function CardComponent({title, subtitle1, subtitle2, subtitle3, favorite, pressAction, editAction, deleteAction, favoriteAction, exportAction, importAction}) {
-    const menuRef = useRef()
+    const menuRef = useRef();
+    let options = [];
+    if (editAction!=null) options.push({action: editAction, text: "Edit"})
+    if (deleteAction!=null) options.push({action: deleteAction, text: "Delete"})
+    if (favoriteAction!=null) options.push({action: favoriteAction, text: "Favorite"})
+    if (importAction!=null) options.push({action: importAction, text: "Import from Clipboard"})
+    if (exportAction!=null) options.push({action: exportAction, text: "Copy to Clipboard"})
     return (
         <View key={title} style={styles.container}>
             <Pressable style={({pressed})=>[pressed ? styles.pressed : styles.unpressed ,styles.pressable]}
@@ -11,13 +17,13 @@ export default function CardComponent({title, subtitle1, subtitle2, subtitle3, f
             onLongPress={()=>menuRef.current.openMenu()}>
                 <View style={styles.title}>
                     <Text style={styles.title}>{title}</Text>
+                    <MenuComponent options={options} ref={menuRef}/>
                 </View>
                 {favorite ?
                     <View>
                         <Image style={styles.image} source={require("../assets/star.png")}/>
                     </View>
                     : <View/>}
-                <MenuComponent ref={menuRef} deleteAction={deleteAction} exportAction={exportAction} favoriteAction={favoriteAction} editAction={editAction} importAction={importAction}/>
                 <View style={styles.subtitles}>
                     <Text style={styles.subtitle}>{subtitle1}</Text>
                     <Text style={styles.subtitle}>{subtitle2}</Text>
@@ -53,12 +59,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#145c7c',
     },
     title: {
-        flex: .5,
+        flex: .45,
         fontSize: 30,
         color: 'white',
     },
     subtitles: {
-        flex: .5,
+        flex: .45,
         flexDirection: 'column',
     },
     subtitle: {
