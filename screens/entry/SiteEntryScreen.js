@@ -79,7 +79,7 @@ export default function SiteEntryScreen({route, navigation}) {
             newObject("sites",value).then((key)=>navigation.navigate("selectSite", {destination: destination}))
         } else {
             value.id = id
-            set(id, value).then(() => navigation.navigate("selectSite", {destination: destination}))
+            set(id, value).then(() => navigation.goBack())
         }
         clearState()
     }

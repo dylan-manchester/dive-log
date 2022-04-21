@@ -10,6 +10,7 @@ import Clipboard from "expo-clipboard";
 import {exportableDive} from "../../data/IO";
 import MenuComponent from "../../components/MenuComponent";
 import ModalMenuComponent from "../../components/ModalMenuComponent";
+import {useFocusEffect} from "@react-navigation/native";
 
 
 export default function DiveViewScreen({route, navigation}) {
@@ -44,30 +45,31 @@ export default function DiveViewScreen({route, navigation}) {
                 })
                 if (isMounted) {
                     setSettings(rv)
-                    get(dive_id).then((rv) => {
-                        if (isMounted) {
-                            setDive(rv)
-                            setDT(new Date(rv.dateTime))
-                            get(rv.siteID).then(setSite)
-                            get(rv.gearID).then(setGear)
-                            setReady(true)
-                        }
-                    })
                 }
             })
         )
         return () => {isMounted = false}
     }, [constant])
 
-    useEffect(()=>{
+    useFocusEffect(
+        React.useCallback(()=>{
         let isMounted = true
         get("settings").then((rv)=>{
             if (isMounted) {
                 setSettings(rv)
+                get(dive_id).then((rv) => {
+                    if (isMounted) {
+                        setDive(rv)
+                        setDT(new Date(rv.dateTime))
+                        get(rv.siteID).then(setSite)
+                        get(rv.gearID).then(setGear)
+                        setReady(true)
+                    }
+                })
             }
         })
         return () => {isMounted = false}
-    },[trigger])
+    },[trigger]))
 
 
     const deleteItem = async (id) => {

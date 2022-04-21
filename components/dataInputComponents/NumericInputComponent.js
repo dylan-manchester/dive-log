@@ -7,7 +7,7 @@ export default function NumericInputComponent({title, value, intervals, setterCa
     const width = Dimensions.get('window').width;
 
     useEffect(()=>{
-        if (value) {setText(value.toString())}
+        if (value) {setText(parseFloat(value).toFixed(0))}
     }, [value])
 
 

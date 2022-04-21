@@ -201,7 +201,7 @@ export default function DiveEntryScreen({route, navigation}) {
                 newObject("dives", value).then(() => navigation.navigate("selectDive", {destination: destination}))
             } else {
                 value.id = id
-                set(id, value).then(() => navigation.navigate("selectDive", {destination: destination}))
+                set(id, value).then(() => navigation.goBack())
             }
             clearState()
         }

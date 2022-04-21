@@ -39,8 +39,7 @@ export default function App() {
                         headerTintColor: '#fff',
                         headerTitleStyle: {
                             fontWeight: 'bold'
-                        },
-                        headerRight: () => (<ModalMenuComponent options={[]}/>)}}>
+                        }}}>
                     <Stack.Group>
                         <Stack.Screen
                             name="home"

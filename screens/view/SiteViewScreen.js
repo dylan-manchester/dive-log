@@ -5,6 +5,7 @@ import {Site} from "../../models/SiteModel";
 import {EventEmitter} from "../../data/EventEmitter"
 import * as UnitConverter from "../../data/UnitConverter"
 import ModalMenuComponent from "../../components/ModalMenuComponent";
+import {useFocusEffect} from "@react-navigation/native";
 
 
 export default function SiteViewScreen({navigation, route}) {
@@ -20,7 +21,8 @@ export default function SiteViewScreen({navigation, route}) {
         return ()=>{EventEmitter.unsubscribe('refreshSiteView')}
     }, [constant])
 
-    useEffect(()=>{
+    useFocusEffect(
+        React.useCallback(()=>{
         let isMounted = true
         get("settings").then((rv)=>{
             navigation.setOptions({
@@ -44,7 +46,7 @@ export default function SiteViewScreen({navigation, route}) {
             }
         })
         return () => {isMounted = false}
-        },[trigger])
+        },[trigger]))
 
     const deleteItem = async (id) => {
         let success = await deleteObject("sites", id)

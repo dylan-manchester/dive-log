@@ -5,6 +5,7 @@ import {Gear} from "../../models/GearModel";
 import {EventEmitter} from "../../data/EventEmitter"
 import * as UnitConverter from "../../data/UnitConverter"
 import ModalMenuComponent from "../../components/ModalMenuComponent";
+import {useFocusEffect} from "@react-navigation/native";
 
 
 export default function GearViewScreen({navigation, route}) {
@@ -20,7 +21,8 @@ export default function GearViewScreen({navigation, route}) {
         return ()=>{EventEmitter.unsubscribe('refreshGearView')}
     }, [constant])
 
-    useEffect(()=>{
+    useFocusEffect(
+        React.useCallback(()=>{
         let isMounted = true
         get("settings").then((rv)=>{
             navigation.setOptions({
@@ -44,7 +46,7 @@ export default function GearViewScreen({navigation, route}) {
             }
         })
         return () => {isMounted = false}
-    },[trigger])
+    },[trigger]))
 
     const deleteItem = async (id) => {
         let success = await deleteObject("gear", id)

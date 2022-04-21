@@ -76,7 +76,7 @@ export default function GearEntryScreen({route, navigation}) {
             newObject("gear",value).then((key)=>navigation.navigate("selectGear", {destination: destination}))
         } else {
             value.id = id
-            set(id, value).then(() => navigation.navigate("selectGear", {destination: destination,}))
+            set(id, value).then(() => navigation.goBack())
         }
         clearState()
     }
