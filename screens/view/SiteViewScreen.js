@@ -17,14 +17,14 @@ export default function SiteViewScreen({navigation, route}) {
     const [settings, setSettings] = useState()
 
     useEffect(()=>{
-        EventEmitter.subscribe('refreshSiteView', (r)=>setTrigger(r))
+        EventEmitter.subscribe('refreshSiteView', ()=>setTrigger(prev=>prev+1))
         return ()=>{EventEmitter.unsubscribe('refreshSiteView')}
     }, [constant])
 
     useFocusEffect(
         React.useCallback(()=>{
         let isMounted = true
-        get("settings").then((rv)=>{
+        get("settings").then((setting)=>{
             navigation.setOptions({
                 headerRight: () => (
                     <ModalMenuComponent
@@ -36,10 +36,12 @@ export default function SiteViewScreen({navigation, route}) {
                 )
             })
             if (isMounted) {
-                setSettings(rv)
-                get(site_id).then((rv) => {
+                setSettings(setting)
+                get(site_id).then((site : Site) => {
+                    site = new Site().initFromObject(site)
+                    if (setting["Units"]) site = site.convertToMetric()
                     if (isMounted) {
-                        setSite(rv)
+                        setSite(site)
                         setReady(true)
                     }
                 })

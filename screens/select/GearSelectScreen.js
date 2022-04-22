@@ -14,7 +14,7 @@ export default function GearSelectScreen({route, navigation}) {
     const [settings, setSettings] = useState();
     const constant = true;
     const [ready, setReady] = useState(false);
-    const [trigger, setTrigger] = useState(false);
+    const [trigger, setTrigger] = useState(0);
     const [favorite, setFavorite] = useState(null);
 
     useFocusEffect(
@@ -30,7 +30,7 @@ export default function GearSelectScreen({route, navigation}) {
     )
 
     useEffect(()=>{
-        EventEmitter.subscribe('refreshGearSelect', (r)=>setTrigger(r))
+        EventEmitter.subscribe('refreshGearSelect', ()=>setTrigger(prev=>prev+1))
         return ()=>{EventEmitter.unsubscribe('refreshGearSelect')}
     }, [constant])
 
@@ -70,7 +70,7 @@ export default function GearSelectScreen({route, navigation}) {
         <CardComponent
             title={item.name}
             subtitle1= {settings["Show Cylinder Type"] ? item.cylinderType : ""}
-            subtitle2= {settings["Show Cylinder Size"] ? settings["Units"] ? UnitConverter.psi2bar(parseFloat(item.cylinderSize)).toFixed(0)+" bar" : parseFloat(item.cylinderSize).toFixed(0)+" psi" : ""}
+            subtitle2= {settings["Show Cylinder Size"] ? parseFloat(item.cylinderSize).toFixed(0)+" ft^3" : ""}
             subtitle3= ""
             favorite={item.id === favorite}
             pressAction={() => selectAction(item.id)}

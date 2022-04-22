@@ -33,17 +33,21 @@ export default function GearEntryScreen({route, navigation}) {
             setID(route.params.gear_id)
             get(route.params.gear_id).then(
                 (gear : Gear)=>{
-                    setName(gear.name)
-                    setCylinderType(gear.cylinderType)
-                    setCylinderSize(gear.cylinderSize)
-                    setDefaultWeight(gear.defaultWeight)
-                    setDefaultStaringPSI(gear.defaultStartingPSI)
+                    gear = new Gear().initFromObject(gear)
+                    get("settings").then((rv)=> {
+                        if (rv["Units"]) gear = gear.convertToMetric()
+                        setName(gear.name)
+                        setCylinderType(gear.cylinderType)
+                        setCylinderSize(gear.cylinderSize)
+                        setDefaultWeight(gear.defaultWeight)
+                        setDefaultStaringPSI(gear.defaultStartingPSI)
+                    })
                 }).catch(e=>console.log(e))
         }
     }, [route.params?.gear_id]);
 
     useEffect(()=>{
-        EventEmitter.subscribe('refreshGearEntry', (r)=>setTrigger(r))
+        EventEmitter.subscribe('refreshGearEntry', ()=>setTrigger(prev=>prev+1))
         return ()=>{EventEmitter.unsubscribe('refreshGearEntry')}
     }, [constant])
 
@@ -60,17 +64,15 @@ export default function GearEntryScreen({route, navigation}) {
     const opts2 = ready ? [
         {toggle: true, title: "Name", value: name, callback: setName},
         {toggle: settings["Show Cylinder Type"], title: "Cylinder Type", options: ["Aluminum", "Steel", "CCR"], value: cylinderType, callback: setCylinderType},
-        {toggle: settings["Show Cylinder Size"], title: settings["Units"] ? "Cylinder Size (L)" : "Cylinder Type (ft^3)", intervals: [1, 10, 25], value: cylinderSize, callback: setCylinderSize},
+        {toggle: settings["Show Cylinder Size"], title: "Cylinder Type (ft^3)", intervals: [1, 10, 25], value: cylinderSize, callback: setCylinderSize},
         {toggle: settings["Show Default Weight"], title: settings["Units"] ? "Default Weight (kg)" : "Default Weight (lbs)" , intervals: [1, 10, 25], value: defaultWeight, callback: setDefaultWeight},
         {toggle: settings["Show Default PSI"], title: settings["Units"] ? "Default Starting Pressure (bar)" : "Default Starting Pressure (psi)", intervals: [50, 100, 500], value: defaultStaringPSI, callback: setDefaultStaringPSI},
     ] : []
 
     const submit = () => {
-        let value
+        let value = new Gear().initFromValues(name, cylinderType, cylinderSize, defaultWeight, defaultStaringPSI)
         if (settings["Units"]) {
-            value = new Gear().initFromValues(name, cylinderType, UnitConverter.L2cuft(cylinderSize), UnitConverter.kg2lbs(defaultWeight),UnitConverter.bar2psi(defaultStaringPSI))
-        } else {
-            value = new Gear().initFromValues(name, cylinderType, cylinderSize, defaultWeight, defaultStaringPSI)
+            value = value.convertFromMetric()
         }
         if (id == null) {
             newObject("gear",value).then((key)=>navigation.navigate("selectGear", {destination: destination}))

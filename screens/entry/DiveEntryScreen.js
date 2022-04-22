@@ -59,24 +59,28 @@ export default function DiveEntryScreen({route, navigation}) {
         if (route.params?.dive_id) {
             setID(route.params.dive_id)
             get(route.params.dive_id).then(
-                (dive : Dive)=>{
-                    setDateTime(new Date(dive.dateTime))
-                    setSiteID(dive.siteID)
-                    setSiteName(dive.siteName)
-                    setGearID(dive.gearID)
-                    setGearName(dive.gearName)
-                    setDepth(dive.depth)
-                    setDuration(dive.duration)
-                    setWeight(dive.weight)
-                    setExposure(dive.exposure)
-                    setStartingPSI(dive.startingPSI)
-                    setEndingPSI(dive.endingPSI)
-                    setNotes1(dive.notes1)
-                    setNotes2(dive.notes2)
-                    setNotes3(dive.notes3)
-                    setNotes4(dive.notes4)
-                    setNotes5(dive.notes5)
-                }).catch(e=>console.log(e))
+                (dive : Dive)=> {
+                    dive = new Dive().initFromObject(dive)
+                    get("settings").then((rv) => {
+                        if (rv["Units"]) dive = dive.convertToMetric()
+                        setDateTime(new Date(dive.dateTime))
+                        setSiteID(dive.siteID)
+                        setSiteName(dive.siteName)
+                        setGearID(dive.gearID)
+                        setGearName(dive.gearName)
+                        setDepth(dive.depth)
+                        setDuration(dive.duration)
+                        setWeight(dive.weight)
+                        setExposure(dive.exposure)
+                        setStartingPSI(dive.startingPSI)
+                        setEndingPSI(dive.endingPSI)
+                        setNotes1(dive.notes1)
+                        setNotes2(dive.notes2)
+                        setNotes3(dive.notes3)
+                        setNotes4(dive.notes4)
+                        setNotes5(dive.notes5)
+                    })
+                })
         }
     }, [route.params?.dive_id]);
 
@@ -87,11 +91,15 @@ export default function DiveEntryScreen({route, navigation}) {
                 get(rv).then(
                     (site : Site)=>{
                         if (site != null) {
-                            setSiteID(rv)
-                            setSiteName(site.name)
-                            setDepth(site.defaultDepth)
+                            site = new Site().initFromObject(site)
+                            get("settings").then((setting) => {
+                                if (setting["Units"]) site = site.convertToMetric()
+                                setSiteID(rv)
+                                setSiteName(site.name)
+                                setDepth(site.defaultDepth)
+                            })
                         }
-                    }).catch(e=>console.log(e))
+                    })
             }
         }).catch(e=>console.log(e))
         get("favGear").then((rv)=>{
@@ -99,18 +107,22 @@ export default function DiveEntryScreen({route, navigation}) {
                 get(rv).then(
                     gear=>{
                         if (gear != null) {
-                            setGearID(rv)
-                            setGearName(gear.name)
-                            setStartingPSI(gear.defaultStartingPSI)
-                            setWeight(gear.defaultWeight)
+                            gear = new Gear().initFromObject(gear)
+                            get("settings").then((setting) => {
+                                if (setting["Units"]) gear = gear.convertToMetric()
+                                setGearID(rv)
+                                setGearName(gear.name)
+                                setStartingPSI(gear.defaultStartingPSI)
+                                setWeight(gear.defaultWeight)
+                            })
                         }
-                    }).catch(e=>console.log(e))
+                    })
             }
-        }).catch(e=>console.log(e))
+        })
     }, [constant]);
 
     useEffect(()=>{
-        EventEmitter.subscribe('refreshDiveEntry', (r)=>setTrigger(r))
+        EventEmitter.subscribe('refreshDiveEntry', ()=>setTrigger(prev=>prev+1))
         return ()=>{EventEmitter.unsubscribe('refreshDiveEntry')}
     }, [constant])
 
@@ -190,12 +202,9 @@ export default function DiveEntryScreen({route, navigation}) {
             if (gearID === undefined) alertMessage += "Please Select a Gear Configuration\n"
             Alert.alert("Halt!", alertMessage)
         } else {
-            let value
+            let value = new Dive().initFromValues(dateTime, siteID, siteName, gearID, gearName, depth, duration, weight, exposure, startingPSI, endingPSI, notes1, notes2, notes3, notes4, notes5)
             if (settings["Units"]) {
-                value = new Dive().initFromValues(dateTime, siteID, siteName, gearID, gearName, UnitConverter.m2ft(depth), duration, UnitConverter.kg2lbs(weight), exposure,UnitConverter.bar2psi(startingPSI),UnitConverter.bar2psi(endingPSI), notes1, notes2, notes3, notes4, notes5)
-            }
-            else {
-                value = new Dive().initFromValues(dateTime, siteID, siteName, gearID, gearName, depth, duration, weight, exposure, startingPSI, endingPSI, notes1, notes2, notes3, notes4, notes5)
+                value = value.convertFromMetric()
             }
             if (id == null) {
                 newObject("dives", value).then(() => navigation.navigate("selectDive", {destination: destination}))

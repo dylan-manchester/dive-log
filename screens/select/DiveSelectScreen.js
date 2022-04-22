@@ -22,7 +22,7 @@ export default function DiveSelectScreen({route, navigation}) {
     const [trigger, setTrigger] = useState(0);
 
     useEffect(()=>{
-        EventEmitter.subscribe('refreshDiveSelect', (r)=>setTrigger(r))
+        EventEmitter.subscribe('refreshDiveSelect', ()=>setTrigger(prev=>prev+1))
         return ()=>{EventEmitter.unsubscribe('refreshDiveSelect')}
     }, [constant])
 

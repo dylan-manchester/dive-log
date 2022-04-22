@@ -1,3 +1,5 @@
+import * as UnitConverter from "../data/UnitConverter"
+
 export class Dive {
     dateTime: Date;
     siteID: string;
@@ -75,6 +77,22 @@ export class Dive {
             if (typeof obj.notes4 != "undefined") this.notes4 = obj.notes4;
             if (typeof obj.notes5 != "undefined") this.notes5 = obj.notes5;
         }
+        return this
+    }
+
+    convertFromMetric() {
+        this.depth = UnitConverter.m2ft(this.depth)
+        this.weight = UnitConverter.kg2lbs(this.weight)
+        this.startingPSI = UnitConverter.bar2psi(this.startingPSI)
+        this.endingPSI = UnitConverter.bar2psi(this.endingPSI)
+        return this
+    }
+
+    convertToMetric() {
+        this.depth = UnitConverter.ft2m(this.depth)
+        this.weight = UnitConverter.lbs2kg(this.weight)
+        this.startingPSI = UnitConverter.psi2bar(this.startingPSI)
+        this.endingPSI = UnitConverter.psi2bar(this.endingPSI)
         return this
     }
 }

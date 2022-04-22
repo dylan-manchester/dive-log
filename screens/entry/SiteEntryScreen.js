@@ -33,18 +33,22 @@ export default function SiteEntryScreen({route, navigation}) {
         if (route.params?.site_id) {
             setID(route.params.site_id)
             get(route.params.site_id).then(
-                (site : Site)=>{
-                    setName(site.name)
-                    setLongitude(site.longitude)
-                    setLatitude(site.latitude)
-                    setWaterType(site.waterType)
-                    setDefaultDepth(site.defaultDepth)
-                }).catch(e=>console.log(e))
+                (site : Site)=> {
+                    site = new Site().initFromObject(site)
+                    get("settings").then((rv) => {
+                        if (rv["Units"]) site = site.convertToMetric()
+                        setName(site.name)
+                        setLongitude(site.longitude)
+                        setLatitude(site.latitude)
+                        setWaterType(site.waterType)
+                        setDefaultDepth(site.defaultDepth)
+                    })
+                })
         }
     }, [route.params?.site_id]);
 
     useEffect(()=>{
-        EventEmitter.subscribe('refreshSiteEntry', (r)=>setTrigger(r))
+        EventEmitter.subscribe('refreshSiteEntry', ()=>setTrigger(prev=>prev+1))
         return ()=>{EventEmitter.unsubscribe('refreshSiteEntry')}
     }, [constant])
 
@@ -66,15 +70,10 @@ export default function SiteEntryScreen({route, navigation}) {
     ] : []
 
     const submit = () => {
-        let value
+        let value = new Site().initFromValues(name, latitude, longitude, waterType, defaultDepth)
         if (settings["Units"]) {
-            value = new Site().initFromValues(name, latitude, longitude, waterType,UnitConverter.m2ft(defaultDepth))
-        } else {
-            value = new Site().initFromValues(name, latitude, longitude, waterType, defaultDepth)
-
+            value.convertFromMetric()
         }
-        console.log("HERE!")
-        console.log(value)
         if (id == null) {
             newObject("sites",value).then((key)=>navigation.navigate("selectSite", {destination: destination}))
         } else {

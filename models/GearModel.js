@@ -1,3 +1,5 @@
+import * as UnitConverter from "../data/UnitConverter"
+
 export class Gear {
     name: string;
     cylinderType: string;
@@ -30,6 +32,18 @@ export class Gear {
             if (typeof obj.defaultWeight != "undefined") this.defaultWeight = obj.defaultWeight;
             if (typeof obj.defaultStartingPSI != "undefined") this.defaultStartingPSI = obj.defaultStartingPSI;
         }
+        return this
+    }
+
+    convertFromMetric() {
+        this.defaultWeight = UnitConverter.kg2lbs(this.defaultWeight)
+        this.defaultStartingPSI = UnitConverter.bar2psi(this.defaultStartingPSI)
+        return this
+    }
+
+    convertToMetric() {
+        this.defaultWeight = UnitConverter.lbs2kg(this.defaultWeight)
+        this.defaultStartingPSI = UnitConverter.psi2bar(this.defaultStartingPSI)
         return this
     }
     

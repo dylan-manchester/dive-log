@@ -1,14 +1,10 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Pressable, Image, StyleSheet, Text, View, ScrollView, Alert} from 'react-native';
 import {deleteObject, get, wait} from "../../data/DAO";
 import {Dive} from "../../models/DiveModel";
 import {Gear} from "../../models/GearModel";
 import {Site} from "../../models/SiteModel";
 import {EventEmitter} from "../../data/EventEmitter"
-import * as UnitConverter from "../../data/UnitConverter"
-import Clipboard from "expo-clipboard";
-import {exportableDive} from "../../data/IO";
-import MenuComponent from "../../components/MenuComponent";
 import ModalMenuComponent from "../../components/ModalMenuComponent";
 import {useFocusEffect} from "@react-navigation/native";
 
@@ -25,7 +21,7 @@ export default function DiveViewScreen({route, navigation}) {
     const [settings, setSettings] = useState()
 
     useEffect(()=>{
-        EventEmitter.subscribe('refreshDiveView', (r)=>setTrigger(r))
+        EventEmitter.subscribe('refreshDiveView', ()=>setTrigger(prev=>prev+1))
         return ()=>{EventEmitter.unsubscribe('refreshDiveView')}
     }, [constant])
 
@@ -54,16 +50,26 @@ export default function DiveViewScreen({route, navigation}) {
     useFocusEffect(
         React.useCallback(()=>{
         let isMounted = true
-        get("settings").then((rv)=>{
+        get("settings").then((setting)=>{
             if (isMounted) {
-                setSettings(rv)
-                get(dive_id).then((rv) => {
+                setSettings(setting)
+                get(dive_id).then((dive : Dive) => {
+                    dive = new Dive().initFromObject(dive)
+                    if (setting["Units"]) dive = dive.convertToMetric()
                     if (isMounted) {
-                        setDive(rv)
-                        setDT(new Date(rv.dateTime))
-                        get(rv.siteID).then(setSite)
-                        get(rv.gearID).then(setGear)
-                        setReady(true)
+                        setDive(dive)
+                        setDT(new Date(dive.dateTime))
+                        get(dive.siteID).then((site: Site)=>{
+                            site = new Site().initFromObject(site)
+                            if (setting["Units"]) site = site.convertToMetric()
+                            setSite(site)
+                            get(dive.gearID).then((gear : Gear)=>{
+                                gear = new Gear().initFromObject(gear)
+                                if (setting["Units"]) gear = gear.convertToMetric()
+                                setGear(gear)
+                                setReady(true)
+                            })
+                        })
                     }
                 })
             }
@@ -102,14 +108,14 @@ export default function DiveViewScreen({route, navigation}) {
                             <Text style={styles.title}>Gear Config</Text>
                             <Text style={styles.subtitle}>Name: {gear.name}</Text>
                             {settings["Show Cylinder Type"] ? <Text style={styles.subtitle}>Cylinder Type: {gear.cylinderType}</Text> : null}
-                            {settings["Show Cylinder Size"] ? <Text style={styles.subtitle}>Cylinder Size: {settings["Units"] ? UnitConverter.cuft2L(parseFloat(gear.cylinderSize)).toFixed(0)+" L" : parseFloat(gear.cylinderSize).toFixed(0)+" ft^3"}</Text> : null}
+                            {settings["Show Cylinder Size"] ? <Text style={styles.subtitle}>Cylinder Size: {parseFloat(gear.cylinderSize).toFixed(0)+(" ft^3")}</Text> : null}
                         </Pressable>
-                        {settings["Show Depth"] ? <Text style={styles.subtitle}>Depth: {settings["Units"] ? UnitConverter.ft2m(parseFloat(dive.depth)).toFixed(0)+" m" : parseFloat(dive.depth).toFixed(0) +" ft"}</Text> : null}
+                        {settings["Show Depth"] ? <Text style={styles.subtitle}>Depth: {parseFloat(dive.depth).toFixed(0)+(settings["Units"] ? " m" : " ft")}</Text> : null}
                         {settings["Show Duration"] ? <Text style={styles.subtitle}>Duration: {dive.duration} min</Text> : null}
-                        {settings["Show Weight"] ? <Text style={styles.subtitle}>Weight: {settings["Units"] ? UnitConverter.lbs2kg(parseFloat(dive.weight)).toFixed(0)+" kg" : parseFloat(dive.weight).toFixed(0) +" lbs"}</Text> : null}
+                        {settings["Show Weight"] ? <Text style={styles.subtitle}>Weight: {parseFloat(dive.weight).toFixed(0)+(settings["Units"] ? " kg" : " lbs")}</Text> : null}
                         {settings["Show Exposure"] ? <Text style={styles.subtitle}>Exposure Suit: {dive.exposure}</Text> : null}
-                        {settings["Show PSI"] ? <Text style={styles.subtitle}>Starting Pressure: {settings["Units"] ? UnitConverter.psi2bar(parseFloat(dive.startingPSI)).toFixed(0)+" bar" : parseFloat(dive.startingPSI).toFixed(0) +" psi"}</Text> : null}
-                        {settings["Show PSI"] ? <Text style={styles.subtitle}>Ending Pressure: {settings["Units"] ? UnitConverter.psi2bar(parseFloat(dive.endingPSI)).toFixed(0)+" bar" : parseFloat(dive.endingPSI).toFixed(0) +" psi"}</Text> : null}
+                        {settings["Show PSI"] ? <Text style={styles.subtitle}>Starting Pressure: {parseFloat(dive.startingPSI).toFixed(0)+(settings["Units"] ? " bar" : " psi")}</Text> : null}
+                        {settings["Show PSI"] ? <Text style={styles.subtitle}>Ending Pressure: {parseFloat(dive.endingPSI).toFixed(0)+(settings["Units"] ? " bar" : " psi")}</Text> : null}
                         {settings["Note 1"]["Show"] ? <Text style={styles.subtitle}>{settings["Note 1"]["Name"]}: {dive.notes1}</Text> : null}
                         {settings["Note 2"]["Show"] ? <Text style={styles.subtitle}>{settings["Note 2"]["Name"]}: {dive.notes2}</Text> : null}
                         {settings["Note 3"]["Show"] ? <Text style={styles.subtitle}>{settings["Note 3"]["Name"]}: {dive.notes3}</Text> : null}

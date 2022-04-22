@@ -17,14 +17,14 @@ export default function GearViewScreen({navigation, route}) {
     const [settings, setSettings] = useState()
 
     useEffect(()=>{
-        EventEmitter.subscribe('refreshGearView', (r)=>setTrigger(r))
+        EventEmitter.subscribe('refreshGearView', ()=>setTrigger(prev=>prev+1))
         return ()=>{EventEmitter.unsubscribe('refreshGearView')}
     }, [constant])
 
     useFocusEffect(
         React.useCallback(()=>{
         let isMounted = true
-        get("settings").then((rv)=>{
+        get("settings").then((setting)=>{
             navigation.setOptions({
                 headerRight: () => (
                     <ModalMenuComponent
@@ -36,10 +36,12 @@ export default function GearViewScreen({navigation, route}) {
                 )
             })
             if (isMounted) {
-                setSettings(rv)
-                get(gear_id).then((rv) => {
+                setSettings(setting)
+                get(gear_id).then((gear : Gear) => {
+                    gear = new Gear().initFromObject(gear)
+                    if (setting["Units"]) gear = gear.convertToMetric()
                     if (isMounted) {
-                        setGear(rv)
+                        setGear(gear)
                         setReady(true)
                     }
                 })
@@ -66,9 +68,9 @@ export default function GearViewScreen({navigation, route}) {
                 <View style={styles.content}>
                     <Text style={styles.title}>{gear.name}</Text>
                     {settings["Show Cylinder Type"] ? <Text style={styles.subtitle}>Cylinder Type: {gear.cylinderType}</Text> : null}
-                    {settings["Show Cylinder Size"] ? <Text style={styles.subtitle}>Cylinder Size: {settings["Units"] ? UnitConverter.cuft2L(parseFloat(gear.cylinderSize)).toFixed(0)+" L" : parseFloat(gear.cylinderSize).toFixed(0)+" ft^3"}</Text> : null}
-                    {settings["Show Default Weight"] ? <Text style={styles.subtitle}>Default Weight: {settings["Units"] ? UnitConverter.lbs2kg(parseFloat(gear.defaultWeight)).toFixed(0)+" kg" : parseFloat(gear.defaultWeight).toFixed(0) +" lbs"}</Text> : null}
-                    {settings["Show Default PSI"] ? <Text style={styles.subtitle}>Default Starting PSI: {settings["Units"] ? UnitConverter.psi2bar(parseFloat(gear.defaultStartingPSI)).toFixed(0)+" bar" : parseFloat(gear.defaultStartingPSI).toFixed(0) +" psi"}</Text> : null}
+                    {settings["Show Cylinder Size"] ? <Text style={styles.subtitle}>Cylinder Size: {parseFloat(gear.cylinderSize).toFixed(0)+(" ft^3")}</Text> : null}
+                    {settings["Show Default Weight"] ? <Text style={styles.subtitle}>Default Weight: {parseFloat(gear.defaultWeight).toFixed(0)+(settings["Units"] ? " kg" : " lbs")}</Text> : null}
+                    {settings["Show Default PSI"] ? <Text style={styles.subtitle}>Default Starting PSI: {parseFloat(gear.defaultStartingPSI).toFixed(0)+(settings["Units"] ? " bar" : " psi")}</Text> : null}
                 </View>
                 : <Image source={require("../../assets/loading.gif")}/> }
         </View>

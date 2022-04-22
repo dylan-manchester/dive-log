@@ -14,7 +14,7 @@ export default function SettingsComponent({close}) {
     const [ready, setReady] = useState(false)
 
     useEffect(()=>{
-        EventEmitter.subscribe('refreshSettings', (r)=>setTrigger(r))
+        EventEmitter.subscribe('refreshSettings', ()=>setTrigger(prev=>prev+1))
         return ()=>{EventEmitter.unsubscribe('refreshSettings')}
     }, [constant])
 
@@ -39,7 +39,7 @@ export default function SettingsComponent({close}) {
 
     const resetSettings = () => {
         set("settings", Settings.initialSettings).then(()=>{
-            setTrigger(trigger+1)
+            setTrigger(prev=>prev+1)
             alert("Settings Reset")
         })
     }
@@ -50,7 +50,7 @@ export default function SettingsComponent({close}) {
                 set("sites", []).then(() =>
                     set("gear", []).then(() =>
                         set("settings", Settings.initialSettings).then(()=> {
-                            setTrigger(trigger+1)
+                            setTrigger(prev=>prev+1)
                             alert("Data Cleared")
                         })
                     )

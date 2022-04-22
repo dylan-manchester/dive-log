@@ -14,7 +14,7 @@ export default function SiteSelectScreen({route, navigation}) {
     const [settings, setSettings] = useState()
     const constant = true;
     const [ready, setReady] = useState(false);
-    const [trigger, setTrigger] = useState(false);
+    const [trigger, setTrigger] = useState(0);
     const [favorite, setFavorite] = useState(null);
 
     useFocusEffect(
@@ -29,7 +29,7 @@ export default function SiteSelectScreen({route, navigation}) {
         },[trigger]))
 
     useEffect(()=>{
-        EventEmitter.subscribe('refreshSiteSelect', (r)=>setTrigger(r))
+        EventEmitter.subscribe('refreshSiteSelect', ()=>setTrigger(prev=>prev+1))
         return ()=>{EventEmitter.unsubscribe('refreshSiteSelect')}
     }, [constant])
 
@@ -47,7 +47,7 @@ export default function SiteSelectScreen({route, navigation}) {
         deleteObject("sites", id).then((success)=>{
             if (success) {
                 setSites([])
-                setTrigger(trigger+1)
+                setTrigger((prev)=>prev+1)
             } else {
                 alert(`Please remove dependent dives first`)
             }

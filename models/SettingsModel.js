@@ -1,6 +1,6 @@
 export class Settings {
     static initialSettings = {
-        "Units": true,
+        "Units": false,
         "Show Depth": true,
         "Show Duration": true,
         "Show Weight": true,
@@ -14,9 +14,9 @@ export class Settings {
         "Show Default Weight": true,
         "Show Default PSI": true,
         "Note 1": {"Show": true, "Name": "Note 1"},
-        "Note 2": {"Show": true, "Name": "Note 2"},
-        "Note 3": {"Show": true, "Name": "Note 3"},
-        "Note 4": {"Show": true, "Name": "Note 4"},
-        "Note 5": {"Show": true, "Name": "Note 5"},
+        "Note 2": {"Show": false, "Name": "Note 2"},
+        "Note 3": {"Show": false, "Name": "Note 3"},
+        "Note 4": {"Show": false, "Name": "Note 4"},
+        "Note 5": {"Show": false, "Name": "Note 5"},
     }
 }

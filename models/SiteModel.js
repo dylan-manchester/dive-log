@@ -1,3 +1,5 @@
+import * as UnitConverter from "../data/UnitConverter"
+
 export class Site {
     name: string;
     latitude: number;
@@ -30,6 +32,16 @@ export class Site {
             if (typeof obj.waterType != "undefined") this.waterType = obj.waterType
             if (typeof obj.defaultDepth != "undefined") this.defaultDepth = obj.defaultDepth
         }
+        return this
+    }
+
+    convertFromMetric() {
+        this.defaultDepth = UnitConverter.m2ft(this.defaultDepth)
+        return this
+    }
+
+    convertToMetric() {
+        this.defaultDepth = UnitConverter.ft2m(this.defaultDepth)
         return this
     }
 

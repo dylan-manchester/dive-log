@@ -11,16 +11,16 @@ export default function ModalMenuComponent(props) {
     function triggerSettingsRefresh() {
         setRefreshes((prev)=>prev+1)
         console.log("Refreshes: "+refreshes)
-        EventEmitter.dispatch('refreshSiteEntry', refreshes)
-        EventEmitter.dispatch('refreshDiveEntry', refreshes)
-        EventEmitter.dispatch('refreshGearEntry', refreshes)
-        EventEmitter.dispatch('refreshDiveSelect', refreshes)
-        EventEmitter.dispatch('refreshSiteSelect', refreshes)
-        EventEmitter.dispatch('refreshGearSelect', refreshes)
-        EventEmitter.dispatch('refreshGearView', refreshes)
-        EventEmitter.dispatch('refreshSiteView', refreshes)
-        EventEmitter.dispatch('refreshDiveView', refreshes)
-        EventEmitter.dispatch('refreshSettings', refreshes)
+        EventEmitter.dispatch('refreshSiteEntry')
+        EventEmitter.dispatch('refreshDiveEntry')
+        EventEmitter.dispatch('refreshGearEntry')
+        EventEmitter.dispatch('refreshDiveSelect')
+        EventEmitter.dispatch('refreshSiteSelect')
+        EventEmitter.dispatch('refreshGearSelect')
+        EventEmitter.dispatch('refreshGearView')
+        EventEmitter.dispatch('refreshSiteView')
+        EventEmitter.dispatch('refreshDiveView')
+        EventEmitter.dispatch('refreshSettings')
     }
 
     const menuRef = useRef();
