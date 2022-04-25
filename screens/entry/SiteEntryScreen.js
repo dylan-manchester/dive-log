@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {Pressable, ScrollView, StyleSheet, Text} from 'react-native';
 import DataInputComponent from "../../components/dataInputComponents/DataInputWrapperComponent";
-import {get, newObject, set} from "../../data/DAO";
+import {filterBySiteID, get, newObject, set} from "../../data/DAO";
 import {Site} from "../../models/SiteModel";
 import * as Location from 'expo-location';
 import {EventEmitter} from "../../data/EventEmitter"
 import * as UnitConverter from "../../data/UnitConverter"
+import {Dive} from "../../models/DiveModel";
 
 
 export default function SiteEntryScreen({route, navigation}) {
@@ -69,16 +70,27 @@ export default function SiteEntryScreen({route, navigation}) {
         {toggle: settings["Show Default Depth"], title: settings["Units"] ? "Default Depth (m)" : "Default Depth (ft)", intervals: [1, 10, 25], value: defaultDepth, callback: setDefaultDepth},
     ] : []
 
-    const submit = () => {
+    const submit = async () => {
         let value = new Site().initFromValues(name, latitude, longitude, waterType, defaultDepth)
         if (settings["Units"]) {
             value.convertFromMetric()
         }
         if (id == null) {
-            newObject("sites",value).then((key)=>navigation.navigate("selectSite", {destination: destination}))
+            newObject("sites", value).then((key) => navigation.navigate("selectSite", {destination: destination}))
         } else {
             value.id = id
-            set(id, value).then(() => navigation.goBack())
+            let old = await get(id)
+            if (old.name !== name) {
+                let dives = await filterBySiteID(id);
+                for (const i in dives) {
+                    let dive = new Dive().initFromObject(dives[i])
+                    dive.siteName = name
+                    dive.id = dives[i].id
+                    await set(dive.id, dive)
+                }
+            }
+            await set(id, value)
+            navigation.goBack()
         }
         clearState()
     }

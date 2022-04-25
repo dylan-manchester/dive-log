@@ -22,22 +22,19 @@ export async function newObject(type, value) {
 export async function deleteObject(topLevelKey, key) {
     try {
         let proceed = true
-        if (topLevelKey !== "dives") {
-            let dives = await getAll("dives")
             let filtered = []
             if (topLevelKey === "sites") {
-                filtered = dives.filter((value, index, array) => value.siteID !== key)
+                filtered = await filterBySiteID(key)
             }
             else if (topLevelKey === "gear") {
-                filtered = dives.filter((value, index, array) => value.gearID !== key)
+                filtered = await filterByGearID(key)
             }
-            if (dives.length !== filtered.length) {
+            if (filtered.length !== 0) {
                 proceed = false
             }
-        }
         if (proceed) {
             let keys = await get(topLevelKey)
-            let filtered = keys.filter((value, index, array) => value !== key)
+            let filtered = keys.filter((value) => value !== key)
             await set(topLevelKey, filtered)
             await del(key)
         }
@@ -117,4 +114,13 @@ export const wait = (timeout) => {
     return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
+export async function filterBySiteID(id) {
+    let dives = await getAll("dives")
+    return dives.filter((value) => value.siteID === id)
+}
+
+export async function filterByGearID(id) {
+    let dives = await getAll("dives")
+    return dives.filter((value) => value.gearID === id)
+}
 

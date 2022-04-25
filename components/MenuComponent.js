@@ -1,5 +1,5 @@
 import {Menu, MenuOption, MenuOptions, MenuTrigger} from "react-native-popup-menu";
-import {Text} from "react-native";
+import {StyleSheet, Text} from "react-native";
 import {forwardRef, useImperativeHandle, useState} from "react";
 
 function MenuComponent(props, ref) {
@@ -20,15 +20,25 @@ function MenuComponent(props, ref) {
             <MenuTrigger/>
             <MenuOptions>
                 {props.options.map((option)=>
-                    <MenuOption key={option.text} onSelect={() => {
+                    <MenuOption style={styles.button} key={option.text} onSelect={() => {
                         setOpened(false)
                         option.action()}}>
-                        <Text>{option.text}</Text>
+                        <Text style={styles.text}>{option.text}</Text>
                     </MenuOption>
                 )}
             </MenuOptions>
         </Menu>
     )
 }
+
+const styles = StyleSheet.create({
+    button: {
+        borderBottomWidth: 0.5,
+        borderColor: 'black',
+    },
+    text: {
+        fontSize: 16,
+    }
+})
 
 export default forwardRef(MenuComponent)

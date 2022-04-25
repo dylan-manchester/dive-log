@@ -1,11 +1,11 @@
-import {Pressable, StyleSheet, Text, View, ScrollView} from "react-native";
+import {Pressable, StyleSheet, Text, View, ScrollView, Alert} from "react-native";
 import {useEffect, useState} from "react";
 import {set, get} from "../data/DAO"
 import SettingsInputWrapperComponent from "./dataInputComponents/SettingsInputWrapperComponent"
 import {Settings} from "../models/SettingsModel"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {EventEmitter} from "../data/EventEmitter"
-import {exportAllDives, importFile} from "../data/IO";
+import {availableHeaders, exportAllDives, importDives, importFile} from "../data/IO";
 
 export default function SettingsComponent({close}) {
     const constant = true
@@ -39,9 +39,24 @@ export default function SettingsComponent({close}) {
 
     const resetSettings = () => {
         set("settings", Settings.initialSettings).then(()=>{
+            setReady(false)
             setTrigger(prev=>prev+1)
             alert("Settings Reset")
         })
+    }
+
+    const clearDataAlert = () => {
+        Alert.alert("WARNING!", "Are you sure you want to delete everything?", [
+            {
+            text: "Cancel",
+            onPress: () => console.log("Deletion Cancelled"),
+            style: "cancel"
+        },
+            {
+                text: "Yes",
+                onPress: clearData
+            }
+        ])
     }
 
     const clearData = () => {
@@ -70,7 +85,7 @@ export default function SettingsComponent({close}) {
                         <SettingsInputWrapperComponent key={key.toString()+":"+settings[key].toString()} props={{title: key, value: settings[key], callback: (value)=>updateSetting(key, value)}} />
                     ) : null
                 }
-                <Pressable style={({pressed})=>[pressed ? styles.pressed : styles.import ,styles.pressable]} onPress={importCSV}>
+                <Pressable style={({pressed})=>[pressed ? styles.pressed : styles.import ,styles.pressable]} onPress={importCSV} onLongPress={()=>Alert.alert("Acceptable Column Headers:", availableHeaders().join("\n"))}>
                     <Text style={styles.textStyle}>Import</Text>
                 </Pressable>
                 <Pressable style={({pressed})=>[pressed ? styles.pressed : styles.export ,styles.pressable]} onPress={exportCSV}>
@@ -79,7 +94,7 @@ export default function SettingsComponent({close}) {
                 <Pressable style={({pressed})=>[pressed ? styles.pressed : styles.reset ,styles.pressable]} onPress={resetSettings}>
                     <Text style={styles.textStyle}>Reset Settings</Text>
                 </Pressable>
-                <Pressable style={({pressed})=>[pressed ? styles.pressed : styles.clear ,styles.pressable]} onPress={clearData}>
+                <Pressable style={({pressed})=>[pressed ? styles.pressed : styles.clear ,styles.pressable]} onPress={clearDataAlert}>
                     <Text style={styles.textStyle}>Clear Data</Text>
                 </Pressable>
             </ScrollView>

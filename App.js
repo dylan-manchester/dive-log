@@ -16,6 +16,7 @@ import ModalMenuComponent from "./components/ModalMenuComponent";
 import {get, set} from "./data/DAO";
 import {MenuProvider} from "react-native-popup-menu";
 import {Settings} from "./models/SettingsModel"
+import {Linking} from "react-native";
 
 
 export default function App() {
@@ -48,7 +49,9 @@ export default function App() {
                                 title: "Home",
                                 headerRight: () => (
                                     <ModalMenuComponent
-                                        options={[{action: () => navigation.navigate("stats"), text: "Stats"}]}/>
+                                        options={[
+                                            {action: () => navigation.navigate("stats"), text: "Stats"},
+                                            {action: () => Linking.openURL("mailto:DataManApps@Gmail.com"), text: "Feedback"}]}/>
                                 )}
                             )}/>
                         <Stack.Screen
