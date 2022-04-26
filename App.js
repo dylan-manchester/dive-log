@@ -52,7 +52,7 @@ export default function App() {
                                     <ModalMenuComponent
                                         options={[
                                             {action: () => navigation.navigate("stats"), text: "Statistics"},
-                                            {action: () => navigation.navigate("stats"), text: "Import/Export"},
+                                            //{action: () => navigation.navigate("stats"), text: "Import/Export"},
                                             {action: () => Linking.openURL("mailto:DataManApps@Gmail.com"), text: "Feedback"},
                                             {action: () => navigation.navigate("credits"), text: "Credits"}]}/>
                                 )}
