@@ -6,6 +6,7 @@ import {EventEmitter} from "../../data/EventEmitter"
 import * as UnitConverter from "../../data/UnitConverter"
 import ModalMenuComponent from "../../components/ModalMenuComponent";
 import {useFocusEffect} from "@react-navigation/native";
+import HeaderIconsComponent from "../../components/HeaderIconsComponent";
 
 
 export default function GearViewScreen({navigation, route}) {
@@ -21,20 +22,20 @@ export default function GearViewScreen({navigation, route}) {
         return ()=>{EventEmitter.unsubscribe('refreshGearView')}
     }, [constant])
 
+    useEffect(()=>{
+        navigation.setOptions({
+            headerRight: () => (
+                <HeaderIconsComponent
+                    editAction={() => editItem(gear_id)}
+                    deleteAction={() => deleteItem(gear_id)}/>
+            )
+        })
+    }, [constant])
+
     useFocusEffect(
         React.useCallback(()=>{
         let isMounted = true
         get("settings").then((setting)=>{
-            navigation.setOptions({
-                headerRight: () => (
-                    <ModalMenuComponent
-                        options={[
-                            {action:()=>editItem(gear_id), text: "Edit"},
-                            {action:()=>deleteItem(gear_id), text: "Delete"}
-                        ]}
-                    />
-                )
-            })
             if (isMounted) {
                 setSettings(setting)
                 get(gear_id).then((gear : Gear) => {

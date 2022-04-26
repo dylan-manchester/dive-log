@@ -7,6 +7,7 @@ import {Site} from "../../models/SiteModel";
 import {EventEmitter} from "../../data/EventEmitter"
 import ModalMenuComponent from "../../components/ModalMenuComponent";
 import {useFocusEffect} from "@react-navigation/native";
+import HeaderIconsComponent from "../../components/HeaderIconsComponent";
 
 
 export default function DiveViewScreen({route, navigation}) {
@@ -25,56 +26,46 @@ export default function DiveViewScreen({route, navigation}) {
         return ()=>{EventEmitter.unsubscribe('refreshDiveView')}
     }, [constant])
 
-    useEffect( () => {
-        let isMounted = true
-        wait(800).then(()=>
-            get("settings").then((rv)=>{
-                navigation.setOptions({
-                    headerRight: () => (
-                        <ModalMenuComponent
-                            options={[
-                                {action: () => editItem(dive_id), text: "Edit"},
-                                {action: () => deleteItem(dive_id), text: "Delete"}
-                            ]}
-                        />
-                    )
-                })
-                if (isMounted) {
-                    setSettings(rv)
-                }
-            })
-        )
-        return () => {isMounted = false}
+    useEffect(()=>{
+        navigation.setOptions({
+            headerRight: () => (
+                <HeaderIconsComponent
+                    editAction={() => editItem(dive_id)}
+                    deleteAction={() => deleteItem(dive_id)}/>
+            )
+        })
     }, [constant])
 
     useFocusEffect(
         React.useCallback(()=>{
-        let isMounted = true
-        get("settings").then((setting)=>{
-            if (isMounted) {
-                setSettings(setting)
-                get(dive_id).then((dive : Dive) => {
-                    dive = new Dive().initFromObject(dive)
-                    if (setting["Units"]) dive = dive.convertToMetric()
+            let isMounted = true
+            wait(800).then(()=> {
+                get("settings").then((setting) => {
                     if (isMounted) {
-                        setDive(dive)
-                        setDT(new Date(dive.dateTime))
-                        get(dive.siteID).then((site: Site)=>{
-                            site = new Site().initFromObject(site)
-                            if (setting["Units"]) site = site.convertToMetric()
-                            setSite(site)
-                            get(dive.gearID).then((gear : Gear)=>{
-                                gear = new Gear().initFromObject(gear)
-                                if (setting["Units"]) gear = gear.convertToMetric()
-                                setGear(gear)
-                                setReady(true)
-                            })
+                        setSettings(setting)
+                        get(dive_id).then((dive: Dive) => {
+                            dive = new Dive().initFromObject(dive)
+                            if (setting["Units"]) dive = dive.convertToMetric()
+                            if (isMounted) {
+                                setDive(dive)
+                                setDT(new Date(dive.dateTime))
+                                get(dive.siteID).then((site: Site) => {
+                                    site = new Site().initFromObject(site)
+                                    if (setting["Units"]) site = site.convertToMetric()
+                                    setSite(site)
+                                    get(dive.gearID).then((gear: Gear) => {
+                                        gear = new Gear().initFromObject(gear)
+                                        if (setting["Units"]) gear = gear.convertToMetric()
+                                        setGear(gear)
+                                        setReady(true)
+                                    })
+                                })
+                            }
                         })
                     }
                 })
-            }
-        })
-        return () => {isMounted = false}
+            })
+            return () => {isMounted = false}
     },[trigger]))
 
 

@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
         borderColor: 'black',
     },
     text: {
-        fontSize: 16,
+        fontSize: 18,
     }
 })
 

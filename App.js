@@ -17,6 +17,7 @@ import {get, set} from "./data/DAO";
 import {MenuProvider} from "react-native-popup-menu";
 import {Settings} from "./models/SettingsModel"
 import {Linking} from "react-native";
+import CreditsScreen from "./screens/CreditsScreen";
 
 
 export default function App() {
@@ -50,14 +51,20 @@ export default function App() {
                                 headerRight: () => (
                                     <ModalMenuComponent
                                         options={[
-                                            {action: () => navigation.navigate("stats"), text: "Stats"},
-                                            {action: () => Linking.openURL("mailto:DataManApps@Gmail.com"), text: "Feedback"}]}/>
+                                            {action: () => navigation.navigate("stats"), text: "Statistics"},
+                                            {action: () => navigation.navigate("stats"), text: "Import/Export"},
+                                            {action: () => Linking.openURL("mailto:DataManApps@Gmail.com"), text: "Feedback"},
+                                            {action: () => navigation.navigate("credits"), text: "Credits"}]}/>
                                 )}
                             )}/>
                         <Stack.Screen
                             name="stats"
                             component={StatsScreen}
                             options={{title: "Statistics"}}/>
+                        <Stack.Screen
+                            name="credits"
+                            component={CreditsScreen}
+                            options={{headerShown: false}}/>
                     </Stack.Group>
                     <Stack.Group>
                         <Stack.Screen

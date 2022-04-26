@@ -6,6 +6,7 @@ import {EventEmitter} from "../../data/EventEmitter"
 import * as UnitConverter from "../../data/UnitConverter"
 import ModalMenuComponent from "../../components/ModalMenuComponent";
 import {useFocusEffect} from "@react-navigation/native";
+import HeaderIconsComponent from "../../components/HeaderIconsComponent";
 
 
 export default function SiteViewScreen({navigation, route}) {
@@ -21,33 +22,33 @@ export default function SiteViewScreen({navigation, route}) {
         return ()=>{EventEmitter.unsubscribe('refreshSiteView')}
     }, [constant])
 
+    useEffect(()=>{
+        navigation.setOptions({
+            headerRight: () => (
+                <HeaderIconsComponent
+                    editAction={() => editItem(site_id)}
+                    deleteAction={() => deleteItem(site_id)}/>
+            )
+        })
+    }, [constant])
+
     useFocusEffect(
         React.useCallback(()=>{
-        let isMounted = true
-        get("settings").then((setting)=>{
-            navigation.setOptions({
-                headerRight: () => (
-                    <ModalMenuComponent
-                        options={[
-                            {action:()=>editItem(site_id), text: "Edit"},
-                            {action:()=>deleteItem(site_id), text: "Delete"}
-                        ]}
-                    />
-                )
+            let isMounted = true
+            get("settings").then((setting)=>{
+                if (isMounted) {
+                    setSettings(setting)
+                    get(site_id).then((site : Site) => {
+                        site = new Site().initFromObject(site)
+                        if (setting["Units"]) site = site.convertToMetric()
+                        if (isMounted) {
+                            setSite(site)
+                            setReady(true)
+                        }
+                    })
+                }
             })
-            if (isMounted) {
-                setSettings(setting)
-                get(site_id).then((site : Site) => {
-                    site = new Site().initFromObject(site)
-                    if (setting["Units"]) site = site.convertToMetric()
-                    if (isMounted) {
-                        setSite(site)
-                        setReady(true)
-                    }
-                })
-            }
-        })
-        return () => {isMounted = false}
+            return () => {isMounted = false}
         },[trigger]))
 
     const deleteItem = async (id) => {
