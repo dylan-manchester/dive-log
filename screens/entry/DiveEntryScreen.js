@@ -35,6 +35,137 @@ export default function DiveEntryScreen({route, navigation}) {
     const [notes4, setNotes4] = useState('')
     const [notes5, setNotes5] = useState('')
 
+    useEffect(()=>{
+        EventEmitter.subscribe('refreshDiveEntry', ()=>setTrigger(prev=>prev+1))
+        return ()=>{EventEmitter.unsubscribe('refreshDiveEntry')}
+    }, [constant])
+
+    useEffect(() => {
+        let isMounted = true
+        get("favSite").then((rv)=>{
+            if (rv != null) {
+                get(rv).then((site)=>{
+                    if (site != null) {
+                        site = new Site().initFromObject(site)
+                        get("settings").then((setting) => {
+                            if (setting["Units"]) site = site.convertToMetric()
+                            if (isMounted) {
+                                setSiteID(rv)
+                                setSiteName(site.name)
+                                setDepth(site.defaultDepth)
+                            }
+                        })
+                    }
+                })
+            }
+        }).catch(e=>console.log(e))
+        get("favGear").then((rv)=>{
+            if (rv != null) {
+                get(rv).then((gear)=>{
+                    if (gear != null) {
+                        gear = new Gear().initFromObject(gear)
+                        get("settings").then((setting) => {
+                            if (setting["Units"]) gear = gear.convertToMetric()
+                            if (isMounted) {
+                                setGearID(rv)
+                                setGearName(gear.name)
+                                setStartingPSI(gear.defaultStartingPSI)
+                                setWeight(gear.defaultWeight)
+                            }
+                        })
+                    }
+                })
+            }
+        })
+        return () => {isMounted = false}
+    }, [constant]);
+
+    useEffect(() => {
+        let isMounted = true
+        if (route.params?.dive_id) {
+            get(route.params.dive_id).then((dive : Dive)=> {
+                dive = new Dive().initFromObject(dive)
+                get("settings").then((rv) => {
+                    if (rv["Units"]) dive = dive.convertToMetric()
+                    if (isMounted) {
+                        setID(route.params.dive_id)
+                        setDateTime(new Date(dive.dateTime))
+                        setSiteID(dive.siteID)
+                        setSiteName(dive.siteName)
+                        setGearID(dive.gearID)
+                        setGearName(dive.gearName)
+                        setDepth(dive.depth)
+                        setDuration(dive.duration)
+                        setWeight(dive.weight)
+                        setExposure(dive.exposure)
+                        setStartingPSI(dive.startingPSI)
+                        setEndingPSI(dive.endingPSI)
+                        setNotes1(dive.notes1)
+                        setNotes2(dive.notes2)
+                        setNotes3(dive.notes3)
+                        setNotes4(dive.notes4)
+                        setNotes5(dive.notes5)
+                    }
+                })
+            })
+        }
+        return () => {isMounted = false}
+    }, [route.params?.dive_id]);
+
+    useEffect(() => {
+        let isMounted = true
+        if (route.params?.site_id) {
+            get(route.params.site_id).then((site)=>{
+                if (isMounted) {
+                    setSiteName(site.name)
+                    setDepth(site.defaultDepth)
+                    setSiteID(route.params.site_id)
+                }
+            })
+        }
+        return () => {isMounted = false}
+    }, [route.params?.site_id]);
+
+    useEffect(() => {
+        let isMounted = true
+        if (route.params?.gear_id) {
+            get(route.params.gear_id).then((gear : Gear)=>{
+                if (isMounted) {
+                    setGearName(gear.name)
+                    setStartingPSI(gear.defaultStartingPSI)
+                    setWeight(gear.defaultWeight)
+                    setGearID(route.params.gear_id)
+                }
+            })
+        }
+        return () => {isMounted = false}
+    }, [route.params?.gear_id]);
+
+    useEffect(()=>{
+        let isMounted = true
+        setReady(false)
+        get("settings").then((rv)=>{
+            if (isMounted) {
+                setSettings(rv)
+                setReady(true)
+            }
+        })
+        return () => {isMounted = false}
+    },[trigger])
+
+    const opts2 = ready ? [
+        {toggle: settings["Show Depth"], title: settings["Units"] ? "Depth (m)" : "Depth (ft)", intervals: [1, 10, 25], value: depth, callback: setDepth},
+        {toggle: settings["Show Duration"], title: "Duration", intervals: [1, 10, 25], value: duration, callback: setDuration},
+        {toggle: settings["Show Weight"], title: settings["Units"] ? "Weight (kg)" : "Weight (lbs)", intervals: [1, 10, 25], value: weight, callback: setWeight},
+        {toggle: settings["Show Exposure"], title: "Exposure Suit", options: ["3mm", "5mm", "7mm", "dry"], value: exposure, callback: setExposure},
+        {toggle: settings["Show PSI"], title: settings["Units"] ? "Starting Pressure (bar)" : "Starting Pressure (psi)" , intervals: [50, 100, 500], value: startingPSI, callback: setStartingPSI},
+        {toggle: settings["Show PSI"], title: settings["Units"] ? "Ending Pressure (bar)" : "Ending Pressure (psi)", intervals: [50, 100, 500], value: endingPSI, callback: setEndingPSI},
+        {toggle: settings["Note 1"]["Show"], title: settings["Note 1"]["Name"], value: notes1, callback: setNotes1},
+        {toggle: settings["Note 2"]["Show"], title: settings["Note 2"]["Name"], value: notes2, callback: setNotes2},
+        {toggle: settings["Note 3"]["Show"], title: settings["Note 3"]["Name"], value: notes3, callback: setNotes3},
+        {toggle: settings["Note 4"]["Show"], title: settings["Note 4"]["Name"], value: notes4, callback: setNotes4},
+        {toggle: settings["Note 5"]["Show"], title: settings["Note 5"]["Name"], value: notes5, callback: setNotes5},
+    ] : []
 
     const clearState = ()=>{
         setDateTime(new Date())
@@ -54,135 +185,6 @@ export default function DiveEntryScreen({route, navigation}) {
         setNotes4('')
         setNotes5('')
     }
-
-    useEffect(() => {
-        if (route.params?.dive_id) {
-            setID(route.params.dive_id)
-            get(route.params.dive_id).then(
-                (dive : Dive)=> {
-                    dive = new Dive().initFromObject(dive)
-                    get("settings").then((rv) => {
-                        if (rv["Units"]) dive = dive.convertToMetric()
-                        setDateTime(new Date(dive.dateTime))
-                        setSiteID(dive.siteID)
-                        setSiteName(dive.siteName)
-                        setGearID(dive.gearID)
-                        setGearName(dive.gearName)
-                        setDepth(dive.depth)
-                        setDuration(dive.duration)
-                        setWeight(dive.weight)
-                        setExposure(dive.exposure)
-                        setStartingPSI(dive.startingPSI)
-                        setEndingPSI(dive.endingPSI)
-                        setNotes1(dive.notes1)
-                        setNotes2(dive.notes2)
-                        setNotes3(dive.notes3)
-                        setNotes4(dive.notes4)
-                        setNotes5(dive.notes5)
-                    })
-                })
-        }
-    }, [route.params?.dive_id]);
-
-
-    useEffect(() => {
-        get("favSite").then((rv)=>{
-            if (rv != null) {
-                get(rv).then(
-                    (site : Site)=>{
-                        if (site != null) {
-                            site = new Site().initFromObject(site)
-                            get("settings").then((setting) => {
-                                if (setting["Units"]) site = site.convertToMetric()
-                                setSiteID(rv)
-                                setSiteName(site.name)
-                                setDepth(site.defaultDepth)
-                            })
-                        }
-                    })
-            }
-        }).catch(e=>console.log(e))
-        get("favGear").then((rv)=>{
-            if (rv != null) {
-                get(rv).then(
-                    gear=>{
-                        if (gear != null) {
-                            gear = new Gear().initFromObject(gear)
-                            get("settings").then((setting) => {
-                                if (setting["Units"]) gear = gear.convertToMetric()
-                                setGearID(rv)
-                                setGearName(gear.name)
-                                setStartingPSI(gear.defaultStartingPSI)
-                                setWeight(gear.defaultWeight)
-                            })
-                        }
-                    })
-            }
-        })
-    }, [constant]);
-
-    useEffect(()=>{
-        EventEmitter.subscribe('refreshDiveEntry', ()=>setTrigger(prev=>prev+1))
-        return ()=>{EventEmitter.unsubscribe('refreshDiveEntry')}
-    }, [constant])
-
-    useEffect(()=>{
-        let isMounted = true
-        setReady(false)
-        get("settings").then((rv)=>{
-            if (isMounted) {
-                setSettings(rv)
-                setReady(true)
-            }
-            return () => {isMounted = false}
-        })},[trigger])
-
-
-    useEffect(() => {
-        let isMounted = true
-        if (route.params?.site_id) {
-            get(route.params.site_id).then(
-                site=>{
-                    if (isMounted) {
-                        setSiteName(site.name)
-                        setDepth(site.defaultDepth)
-                        setSiteID(route.params.site_id)
-                    }
-                })
-        }
-        return () => {isMounted = false}
-    }, [route.params?.site_id]);
-
-    useEffect(() => {
-        let isMounted = true
-        if (route.params?.gear_id) {
-            get(route.params.gear_id).then(
-                (gear : Gear)=>{
-                    if (isMounted) {
-                        setGearName(gear.name)
-                        setStartingPSI(gear.defaultStartingPSI)
-                        setWeight(gear.defaultWeight)
-                        setGearID(route.params.gear_id)
-                    }
-                })
-        }
-        return () => {isMounted = false}
-    }, [route.params?.gear_id]);
-
-
-    const opts2 = ready ? [
-        {toggle: settings["Show Depth"], title: settings["Units"] ? "Depth (m)" : "Depth (ft)", intervals: [1, 10, 25], value: depth, callback: setDepth},
-        {toggle: settings["Show Duration"], title: "Duration", intervals: [1, 10, 25], value: duration, callback: setDuration},
-        {toggle: settings["Show Weight"], title: settings["Units"] ? "Weight (kg)" : "Weight (lbs)", intervals: [1, 10, 25], value: weight, callback: setWeight},
-        {toggle: settings["Show Exposure"], title: "Exposure Suit", options: ["3mm", "5mm", "7mm", "dry"], value: exposure, callback: setExposure},
-        {toggle: settings["Show PSI"], title: settings["Units"] ? "Starting Pressure (bar)" : "Starting Pressure (psi)" , intervals: [50, 100, 500], value: startingPSI, callback: setStartingPSI},
-        {toggle: settings["Show PSI"], title: settings["Units"] ? "Ending Pressure (bar)" : "Ending Pressure (psi)", intervals: [50, 100, 500], value: endingPSI, callback: setEndingPSI},
-        {toggle: settings["Note 1"]["Show"], title: settings["Note 1"]["Name"], value: notes1, callback: setNotes1},
-        {toggle: settings["Note 2"]["Show"], title: settings["Note 2"]["Name"], value: notes2, callback: setNotes2},
-        {toggle: settings["Note 3"]["Show"], title: settings["Note 3"]["Name"], value: notes3, callback: setNotes3},
-        {toggle: settings["Note 4"]["Show"], title: settings["Note 4"]["Name"], value: notes4, callback: setNotes4},
-        {toggle: settings["Note 5"]["Show"], title: settings["Note 5"]["Name"], value: notes5, callback: setNotes5},
-    ] : []
 
     const onChange = (event, selectedDateTime) => {
         const currentDateTime = selectedDateTime || dateTime;
