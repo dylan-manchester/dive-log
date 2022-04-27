@@ -1,0 +1,47 @@
+:root{
+  /* Color Scheme */
+    --primary-color: #EEE;
+
+    --background-color: #000;
+        
+    --text-color: #FFF;
+}
+
+h1{
+    font-size: 4em;
+    color: var(--primary-color);
+    font-family: "Lato", sans-serif;
+    text-align: center;
+}
+h2{
+    font-size: 2em;
+
+}
+p{
+    font-size: 1em;
+}
+
+
+body, html {
+    color: var(--text-color);
+    background-color: var(--background-color);
+    line-height: 2;
+    font-family:Verdana,sans-serif;
+    font-size:15px;
+    margin: 5vmin;
+}
+
+a{
+    text-decoration: underline;
+    color: var(--text-color);
+}
+a:visted {
+    color: var(--text-color);
+}
+a:hover {
+    color: var(--primary-color);
+    font: bold;
+}
+a:active {
+    color: var(--text-color);
+}
