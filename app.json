@@ -17,14 +17,19 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.datamanapps.divelog"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "android": {
       "package": "com.datamanapps.divelog",
-      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "FOREGROUND_SERVICE"]
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "FOREGROUND_SERVICE"
+      ]
     }
   }
 }
