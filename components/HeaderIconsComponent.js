@@ -1,12 +1,8 @@
 import SettingsComponent from "./SettingsComponent";
-import {Image, Modal, Pressable, StyleSheet, View} from "react-native";
-import React, {useRef, useState} from "react";
+import {Modal, Pressable, StyleSheet, View} from "react-native";
+import React, {useState} from "react";
 import {EventEmitter} from "../data/EventEmitter";
-import MenuComponent from "./MenuComponent";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
-import { faGear } from "@fortawesome/free-solid-svg-icons";
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default function HeaderIconsComponent(props) {
     const [refreshes,setRefreshes] = useState(1)
@@ -30,13 +26,13 @@ export default function HeaderIconsComponent(props) {
     return(
         <View style={styles.container}>
             <Pressable style={styles.icon} onPress={props.editAction}>
-                <FontAwesomeIcon icon={faPencilAlt} color={'white'} size={24}/>
+                <Icon name="pencil" color='white' size={28}/>
             </Pressable>
             <Pressable style={styles.icon} onPress={props.deleteAction}>
-                <FontAwesomeIcon icon={faTrashAlt} color={'white'} size={24}/>
+                <Icon name="trash" color='white' size={28}/>
             </Pressable>
             <Pressable style={styles.icon} onPress={()=>setModalVisible(true)}>
-                <FontAwesomeIcon icon={faGear} color={'white'} size={24}/>
+                <Icon name="gear" color='white' size={28}/>
                 <Modal
                     style = {styles.modal}
                     animationType="slide"

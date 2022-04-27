@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Dive Log",
-    "slug": "dive-log",
-    "version": "0.2.0",
+    "name": "Simple Dive Log",
+    "slug": "simple-dive-log",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -18,13 +18,13 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.datamanapps.divelog"
+      "bundleIdentifier": "com.datamanapps.simpledivelog"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "android": {
-      "package": "com.datamanapps.divelog",
+      "package": "com.datamanapps.simpledivelog",
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",

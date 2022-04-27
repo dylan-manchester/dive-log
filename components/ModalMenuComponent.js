@@ -3,8 +3,7 @@ import {Image, Modal, Pressable, StyleSheet, View} from "react-native";
 import React, {useRef, useState} from "react";
 import {EventEmitter} from "../data/EventEmitter";
 import MenuComponent from "./MenuComponent";
-import {faBars} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default function ModalMenuComponent(props) {
     const [refreshes,setRefreshes] = useState(1)
@@ -30,7 +29,7 @@ export default function ModalMenuComponent(props) {
     return(
         <View>
             <Pressable onPress={props.options !== [] ? ()=>menuRef.current.openMenu() : ()=>setModalVisible(true)}>
-                <FontAwesomeIcon icon={faBars} color={'white'} size={24}/>
+                <Icon name="bars" color='white' size={28}/>
                 <MenuComponent options={[{action: ()=>setModalVisible(true), text: "Settings"}, ...props.options]} ref={menuRef}/>
                 <Modal
                     style = {styles.modal}
