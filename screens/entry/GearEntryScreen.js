@@ -35,7 +35,6 @@ export default function GearEntryScreen({route, navigation}) {
                 (gear : Gear)=>{
                     gear = new Gear().initFromObject(gear)
                     get("settings").then((rv)=> {
-                        if (rv["Units"]) gear = gear.convertToMetric()
                         setName(gear.name)
                         setCylinderType(gear.cylinderType)
                         setCylinderSize(gear.cylinderSize)
@@ -65,15 +64,12 @@ export default function GearEntryScreen({route, navigation}) {
         {toggle: true, title: "Name", value: name, callback: setName},
         {toggle: settings["Show Cylinder Type"], title: "Cylinder Type", options: ["Aluminum", "Steel", "CCR"], value: cylinderType, callback: setCylinderType},
         {toggle: settings["Show Cylinder Size"], title: "Cylinder Type (ft^3)", intervals: [1, 10, 25], value: cylinderSize, callback: setCylinderSize},
-        {toggle: settings["Show Default Weight"], title: settings["Units"] ? "Default Weight (kg)" : "Default Weight (lbs)" , intervals: [1, 10, 25], value: defaultWeight, callback: setDefaultWeight},
-        {toggle: settings["Show Default PSI"], title: settings["Units"] ? "Default Starting Pressure (bar)" : "Default Starting Pressure (psi)", intervals: [50, 100, 500], value: defaultStaringPSI, callback: setDefaultStaringPSI},
+        {toggle: settings["Show Default Weight"], title: "Default Weight (lbs)" , intervals: [1, 10, 25], value: defaultWeight, callback: setDefaultWeight},
+        {toggle: settings["Show Default PSI"], title: "Default Starting Pressure (psi)", intervals: [50, 100, 500], value: defaultStaringPSI, callback: setDefaultStaringPSI},
     ] : []
 
     const submit = () => {
         let value = new Gear().initFromValues(name, cylinderType, cylinderSize, defaultWeight, defaultStaringPSI)
-        if (settings["Units"]) {
-            value = value.convertFromMetric()
-        }
         if (id == null) {
             newObject("gear",value).then((key)=>navigation.navigate("selectGear", {destination: destination}))
         } else {

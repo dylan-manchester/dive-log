@@ -1,6 +1,5 @@
 export class Settings {
     static initialSettings = {
-        "Units": false,
         "Show Depth": true,
         "Show Duration": true,
         "Show Weight": true,

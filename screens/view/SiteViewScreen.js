@@ -40,7 +40,6 @@ export default function SiteViewScreen({navigation, route}) {
                     setSettings(setting)
                     get(site_id).then((site : Site) => {
                         site = new Site().initFromObject(site)
-                        if (setting["Units"]) site = site.convertToMetric()
                         if (isMounted) {
                             setSite(site)
                             setReady(true)
@@ -69,7 +68,7 @@ export default function SiteViewScreen({navigation, route}) {
                     <Text style={styles.title}>{site.name}</Text>
                     {settings["Show Location"] ? <Text style={styles.subtitle}>Location: ({site.latitude},{site.longitude})</Text> : null }
                     {settings["Show Water Type"] ? <Text style={styles.subtitle}>Water Type: {site.waterType}</Text> : null }
-                    {settings["Show Default Depth"] ?<Text style={styles.subtitle}>Default Depth: {settings["Units"] ? UnitConverter.ft2m(parseFloat(site.defaultDepth)).toFixed(0)+" m" : parseFloat(site.defaultDepth).toFixed(0) +" ft"}</Text> : null }
+                    {settings["Show Default Depth"] ?<Text style={styles.subtitle}>Default Depth: {site.defaultDepth+" ft"}</Text> : null }
                 </View>
                 : <Image source={require("../../assets/loading.gif")}/> }
         </View>

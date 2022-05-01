@@ -48,7 +48,6 @@ export default function DiveEntryScreen({route, navigation}) {
                     if (site != null) {
                         site = new Site().initFromObject(site)
                         get("settings").then((setting) => {
-                            if (setting["Units"]) site = site.convertToMetric()
                             if (isMounted) {
                                 setSiteID(rv)
                                 setSiteName(site.name)
@@ -65,7 +64,6 @@ export default function DiveEntryScreen({route, navigation}) {
                     if (gear != null) {
                         gear = new Gear().initFromObject(gear)
                         get("settings").then((setting) => {
-                            if (setting["Units"]) gear = gear.convertToMetric()
                             if (isMounted) {
                                 setGearID(rv)
                                 setGearName(gear.name)
@@ -86,7 +84,6 @@ export default function DiveEntryScreen({route, navigation}) {
             get(route.params.dive_id).then((dive : Dive)=> {
                 dive = new Dive().initFromObject(dive)
                 get("settings").then((rv) => {
-                    if (rv["Units"]) dive = dive.convertToMetric()
                     if (isMounted) {
                         setID(route.params.dive_id)
                         setDateTime(new Date(dive.dateTime))
@@ -154,12 +151,12 @@ export default function DiveEntryScreen({route, navigation}) {
     },[trigger])
 
     const opts2 = ready ? [
-        {toggle: settings["Show Depth"], title: settings["Units"] ? "Depth (m)" : "Depth (ft)", intervals: [1, 10, 25], value: depth, callback: setDepth},
+        {toggle: settings["Show Depth"], title: "Depth (ft)", intervals: [1, 10, 25], value: depth, callback: setDepth},
         {toggle: settings["Show Duration"], title: "Duration", intervals: [1, 10, 25], value: duration, callback: setDuration},
-        {toggle: settings["Show Weight"], title: settings["Units"] ? "Weight (kg)" : "Weight (lbs)", intervals: [1, 10, 25], value: weight, callback: setWeight},
+        {toggle: settings["Show Weight"], title: "Weight (lbs)", intervals: [1, 10, 25], value: weight, callback: setWeight},
         {toggle: settings["Show Exposure"], title: "Exposure Suit", options: ["3mm", "5mm", "7mm", "dry"], value: exposure, callback: setExposure},
-        {toggle: settings["Show PSI"], title: settings["Units"] ? "Starting Pressure (bar)" : "Starting Pressure (psi)" , intervals: [50, 100, 500], value: startingPSI, callback: setStartingPSI},
-        {toggle: settings["Show PSI"], title: settings["Units"] ? "Ending Pressure (bar)" : "Ending Pressure (psi)", intervals: [50, 100, 500], value: endingPSI, callback: setEndingPSI},
+        {toggle: settings["Show PSI"], title: "Starting PSI" , intervals: [50, 100, 500], value: startingPSI, callback: setStartingPSI},
+        {toggle: settings["Show PSI"], title: "Ending PSI", intervals: [50, 100, 500], value: endingPSI, callback: setEndingPSI},
         {toggle: settings["Note 1"]["Show"], title: settings["Note 1"]["Name"], value: notes1, callback: setNotes1},
         {toggle: settings["Note 2"]["Show"], title: settings["Note 2"]["Name"], value: notes2, callback: setNotes2},
         {toggle: settings["Note 3"]["Show"], title: settings["Note 3"]["Name"], value: notes3, callback: setNotes3},
@@ -205,9 +202,6 @@ export default function DiveEntryScreen({route, navigation}) {
             Alert.alert("Halt!", alertMessage)
         } else {
             let value = new Dive().initFromValues(dateTime, siteID, siteName, gearID, gearName, depth, duration, weight, exposure, startingPSI, endingPSI, notes1, notes2, notes3, notes4, notes5)
-            if (settings["Units"]) {
-                value = value.convertFromMetric()
-            }
             if (id == null) {
                 newObject("dives", value).then(() => navigation.navigate("selectDive", {destination: destination}))
             } else {

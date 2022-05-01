@@ -8,7 +8,7 @@ export default function SwitchInputComponent({title, value, setterCallback}) {
     return (
         <View style={styles.container}>
             <View style={styles.description}>
-                <Text style={styles.text}>{title === "Units" ? switchOn ? "Units: Metric" : "Units: Imperial" : title}</Text>
+                <Text style={styles.text}>{title}</Text>
             </View>
             <View style={styles.content}>
                 <Switch value={switchOn} onValueChange={(rv)=>{

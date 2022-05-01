@@ -73,7 +73,7 @@ export default function DiveSelectScreen({route, navigation}) {
         return <CardComponent
             title={String(dt.getMonth()).padStart(2,'0')+"/"+String(dt.getDate()).padStart(2,'0')+"/"+ dt.getFullYear()+" "+ String(dt.getHours()).padStart(2,'0')+":"+ String(dt.getMinutes()).padStart(2,'0')}
             subtitle1={item.siteName}
-            subtitle2={settings["Show Depth"] ? settings["Units"] ? UnitConverter.ft2m(parseFloat(item.depth)).toFixed(0)+" m" : parseFloat(item.depth).toFixed(0)+" ft" : ""}
+            subtitle2={settings["Show Depth"] ? parseFloat(item.depth).toFixed(0)+" ft" : ""}
             subtitle3={settings["Show Duration"] ? item.duration+" min" : ""}
             pressAction={() => selectAction(item.id)}
             editAction={()=> editItem(item.id)}

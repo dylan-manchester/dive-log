@@ -37,7 +37,6 @@ export default function SiteEntryScreen({route, navigation}) {
                 (site : Site)=> {
                     site = new Site().initFromObject(site)
                     get("settings").then((rv) => {
-                        if (rv["Units"]) site = site.convertToMetric()
                         setName(site.name)
                         setLongitude(site.longitude)
                         setLatitude(site.latitude)
@@ -67,14 +66,11 @@ export default function SiteEntryScreen({route, navigation}) {
         {toggle: true, title: "Name", value: name, callback: setName},
         {toggle: settings["Show Water Type"], title: "Water Type", options: ["Salt", "Fresh"], value: waterType, callback: setWaterType},
         {toggle: settings["Show Location"], title: "Location", latitude: latitude, longitude: longitude, latitudeCallback: setLatitude, longitudeCallback: setLongitude},
-        {toggle: settings["Show Default Depth"], title: settings["Units"] ? "Default Depth (m)" : "Default Depth (ft)", intervals: [1, 10, 25], value: defaultDepth, callback: setDefaultDepth},
+        {toggle: settings["Show Default Depth"], title: "Default Depth (ft)", intervals: [1, 10, 25], value: defaultDepth, callback: setDefaultDepth},
     ] : []
 
     const submit = async () => {
         let value = new Site().initFromValues(name, latitude, longitude, waterType, defaultDepth)
-        if (settings["Units"]) {
-            value.convertFromMetric()
-        }
         if (id == null) {
             newObject("sites", value).then((key) => navigation.navigate("selectSite", {destination: destination}))
         } else {

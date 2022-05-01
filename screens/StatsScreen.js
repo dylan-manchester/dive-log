@@ -27,7 +27,6 @@ export default function StatsScreen() {
                     for (const i in dives) {
                         let dive = await get(dives[i])
                         dive = new Dive().initFromObject(dive)
-                        if (setting["Units"]) dive = dive.convertToMetric()
                         let duration = parseInt(dive.duration)
                         let depth = parseInt(dive.depth)
                         sum = sum + duration
@@ -68,7 +67,7 @@ export default function StatsScreen() {
                     </View>
                     <View style={styles.cell}>
                         <Text style={styles.title}>Max Depth:</Text>
-                        <Text style={styles.statistic}>{maxDepth ? maxDepth+(settings["Units"] ? " m" : " ft") : "---"}</Text>
+                        <Text style={styles.statistic}>{maxDepth ? maxDepth : "---"}</Text>
                     </View>
                 </View>
             </View>

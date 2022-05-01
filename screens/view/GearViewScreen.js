@@ -40,7 +40,6 @@ export default function GearViewScreen({navigation, route}) {
                 setSettings(setting)
                 get(gear_id).then((gear : Gear) => {
                     gear = new Gear().initFromObject(gear)
-                    if (setting["Units"]) gear = gear.convertToMetric()
                     if (isMounted) {
                         setGear(gear)
                         setReady(true)
@@ -69,9 +68,9 @@ export default function GearViewScreen({navigation, route}) {
                 <View style={styles.content}>
                     <Text style={styles.title}>{gear.name}</Text>
                     {settings["Show Cylinder Type"] ? <Text style={styles.subtitle}>Cylinder Type: {gear.cylinderType}</Text> : null}
-                    {settings["Show Cylinder Size"] ? <Text style={styles.subtitle}>Cylinder Size: {parseFloat(gear.cylinderSize).toFixed(0)+(" ft^3")}</Text> : null}
-                    {settings["Show Default Weight"] ? <Text style={styles.subtitle}>Default Weight: {parseFloat(gear.defaultWeight).toFixed(0)+(settings["Units"] ? " kg" : " lbs")}</Text> : null}
-                    {settings["Show Default PSI"] ? <Text style={styles.subtitle}>Default Starting PSI: {parseFloat(gear.defaultStartingPSI).toFixed(0)+(settings["Units"] ? " bar" : " psi")}</Text> : null}
+                    {settings["Show Cylinder Size"] ? <Text style={styles.subtitle}>Cylinder Size: {gear.cylinderSize+" ft^3"}</Text> : null}
+                    {settings["Show Default Weight"] ? <Text style={styles.subtitle}>Default Weight: {gear.defaultWeight}</Text> : null}
+                    {settings["Show Default PSI"] ? <Text style={styles.subtitle}>Default Starting PSI: {gear.defaultStartingPSI}</Text> : null}
                 </View>
                 : <Image source={require("../../assets/loading.gif")}/> }
         </View>

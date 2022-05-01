@@ -41,28 +41,25 @@ export default function DiveViewScreen({route, navigation}) {
             let isMounted = true
             wait(800).then(()=> {
                 get("settings").then((setting) => {
-                    if (isMounted) {
-                        setSettings(setting)
-                        get(dive_id).then((dive: Dive) => {
-                            dive = new Dive().initFromObject(dive)
-                            if (setting["Units"]) dive = dive.convertToMetric()
-                            if (isMounted) {
-                                setDive(dive)
-                                setDT(new Date(dive.dateTime))
-                                get(dive.siteID).then((site: Site) => {
-                                    site = new Site().initFromObject(site)
-                                    if (setting["Units"]) site = site.convertToMetric()
-                                    setSite(site)
-                                    get(dive.gearID).then((gear: Gear) => {
-                                        gear = new Gear().initFromObject(gear)
-                                        if (setting["Units"]) gear = gear.convertToMetric()
+                    get(dive_id).then((dive: Dive) => {
+                        dive = new Dive().initFromObject(dive)
+                        if (isMounted) {
+                            get(dive.siteID).then((site: Site) => {
+                                site = new Site().initFromObject(site)
+                                get(dive.gearID).then((gear: Gear) => {
+                                    gear = new Gear().initFromObject(gear)
+                                    if (isMounted) {
+                                        setSettings(setting)
+                                        setDive(dive)
+                                        setDT(new Date(dive.dateTime))
+                                        setSite(site)
                                         setGear(gear)
                                         setReady(true)
-                                    })
+                                    }
                                 })
-                            }
-                        })
-                    }
+                            })
+                        }
+                    })
                 })
             })
             return () => {isMounted = false}
@@ -101,12 +98,12 @@ export default function DiveViewScreen({route, navigation}) {
                             {settings["Show Cylinder Type"] ? <Text style={styles.subtitle}>Cylinder Type: {gear.cylinderType}</Text> : null}
                             {settings["Show Cylinder Size"] ? <Text style={styles.subtitle}>Cylinder Size: {parseFloat(gear.cylinderSize).toFixed(0)+(" ft^3")}</Text> : null}
                         </Pressable>
-                        {settings["Show Depth"] ? <Text style={styles.subtitle}>Depth: {parseFloat(dive.depth).toFixed(0)+(settings["Units"] ? " m" : " ft")}</Text> : null}
+                        {settings["Show Depth"] ? <Text style={styles.subtitle}>Depth: {dive.depth}</Text> : null}
                         {settings["Show Duration"] ? <Text style={styles.subtitle}>Duration: {dive.duration} min</Text> : null}
-                        {settings["Show Weight"] ? <Text style={styles.subtitle}>Weight: {parseFloat(dive.weight).toFixed(0)+(settings["Units"] ? " kg" : " lbs")}</Text> : null}
+                        {settings["Show Weight"] ? <Text style={styles.subtitle}>Weight: {dive.weight}</Text> : null}
                         {settings["Show Exposure"] ? <Text style={styles.subtitle}>Exposure Suit: {dive.exposure}</Text> : null}
-                        {settings["Show PSI"] ? <Text style={styles.subtitle}>Starting Pressure: {parseFloat(dive.startingPSI).toFixed(0)+(settings["Units"] ? " bar" : " psi")}</Text> : null}
-                        {settings["Show PSI"] ? <Text style={styles.subtitle}>Ending Pressure: {parseFloat(dive.endingPSI).toFixed(0)+(settings["Units"] ? " bar" : " psi")}</Text> : null}
+                        {settings["Show PSI"] ? <Text style={styles.subtitle}>Starting Pressure: {dive.startingPSI}</Text> : null}
+                        {settings["Show PSI"] ? <Text style={styles.subtitle}>Ending Pressure: {dive.endingPSI}</Text> : null}
                         {settings["Note 1"]["Show"] ? <Text style={styles.subtitle}>{settings["Note 1"]["Name"]}: {dive.notes1}</Text> : null}
                         {settings["Note 2"]["Show"] ? <Text style={styles.subtitle}>{settings["Note 2"]["Name"]}: {dive.notes2}</Text> : null}
                         {settings["Note 3"]["Show"] ? <Text style={styles.subtitle}>{settings["Note 3"]["Name"]}: {dive.notes3}</Text> : null}
