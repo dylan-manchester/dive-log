@@ -2,7 +2,7 @@
   "expo": {
     "name": "Simple Dive Log",
     "slug": "simple-dive-log",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -24,12 +24,16 @@
       "favicon": "./assets/favicon.png"
     },
     "android": {
+      "versionCode": 2,
       "package": "com.datamanapps.simpledivelog",
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
         "FOREGROUND_SERVICE"
       ]
-    }
+    },
+    "plugins": [
+      "./plugins/android-manifest.plugin.js"
+    ]
   }
 }
