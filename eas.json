@@ -10,7 +10,7 @@
     "test": {
       "distribution": "internal"
     },
-    "prod": {}
+    "production": {}
   },
   "submit": {
     "production": {

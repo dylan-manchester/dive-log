@@ -7,6 +7,7 @@
     "android": "npx expo start --android",
     "ios": "npx expo start --ios",
     "web": "npx expo start --web",
+    "submit": "npx eas-cli@latest build --auto-submit --profile production --platform android",
     "eject": "npx expo eject"
   },
   "dependencies": {
